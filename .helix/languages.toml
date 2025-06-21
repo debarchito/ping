@@ -1,0 +1,19 @@
+[[language]]
+name = "svelte"
+formatter = { command = "prettier", args = [
+  "--plugin",
+  "prettier-plugin-svelte",
+  "--parser",
+  "svelte",
+] }
+auto-format = true
+
+[[language]]
+name = "javascript"
+formatter = { command = "prettier", args = ["--parser", "typescript"] }
+auto-format = true
+
+[[language]]
+name = "typescript"
+formatter = { command = "prettier", args = ["--parser", "typescript"] }
+auto-format = true
