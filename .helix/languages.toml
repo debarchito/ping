@@ -1,12 +1,17 @@
+[language-server.tailwindcss]
+command = "tailwindcss-language-server"
+args = ["--stdio"]
+
 [[language]]
 name = "svelte"
 formatter = { command = "prettier", args = [
-  "--plugin",
-  "prettier-plugin-svelte",
-  "--parser",
-  "svelte",
+    "--plugin",
+    "prettier-plugin-svelte",
+    "--parser",
+    "svelte",
 ] }
 auto-format = true
+language-servers = ["svelteserver", "tailwindcss"]
 
 [[language]]
 name = "javascript"
