@@ -1,7 +1,7 @@
 {
   "name": "ping",
   "version": "0.1.0",
-  "description": "A simple reference chat application.",
+  "description": "A simple reference chat application",
   "type": "module",
   "scripts": {
     "dev": "vite dev",
