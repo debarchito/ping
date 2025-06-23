@@ -7,13 +7,18 @@ import { db } from "$lib/server/db";
 
 export const load: PageServerLoad = async ({ locals }) => {
   if (locals.session) {
-    return redirect(302, "/new");
+    return redirect(302, "/room");
   }
+
   return {};
 };
 
 export const actions: Actions = {
   "sign-in": async (event) => {
+    if (event.locals.session) {
+      return fail(405, { message: "Method Not Allowed" });
+    }
+
     const formData = await event.request.formData();
     const username = formData.get("username");
     const password = formData.get("password");
@@ -55,6 +60,6 @@ export const actions: Actions = {
       return fail(500, { message: "Oops...something went wrong" });
     }
 
-    return redirect(302, "/new");
+    return redirect(302, "/room");
   },
 };

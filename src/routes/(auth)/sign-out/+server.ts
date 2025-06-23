@@ -2,7 +2,7 @@ import type { RequestHandler } from "./$types";
 import * as auth from "$lib/server/auth";
 import { redirect } from "@sveltejs/kit";
 
-export const GET: RequestHandler = async (event) => {
+export const DELETE: RequestHandler = async (event) => {
   if (!event.locals.session) {
     return redirect(302, "/sign-in");
   }
@@ -15,3 +15,6 @@ export const GET: RequestHandler = async (event) => {
 
   return redirect(302, "/sign-in");
 };
+
+export const GET: RequestHandler = DELETE;
+export const POST: RequestHandler = DELETE;

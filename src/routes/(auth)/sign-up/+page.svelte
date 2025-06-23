@@ -32,13 +32,13 @@
     <div class="grid gap-4">
       <form class="grid gap-4" method="POST" action="?/sign-up" use:enhance>
         <div class="grid gap-2">
-          <Label for="username">Username</Label>
+          <Label for="username">Username <span class="text-red-500">*</span></Label>
           <Input id="username" type="username" name="username" placeholder="janedoe" required />
         </div>
 
         <div class="grid gap-2">
           <div class="flex items-center">
-            <Label for="password">Password</Label>
+            <Label for="password">Password <span class="text-red-500">*</span></Label>
           </div>
           <div class="relative">
             <Input
@@ -66,7 +66,7 @@
 
         <div class="grid gap-2">
           <div class="flex items-center">
-            <Label for="repeat-password">Repeat password</Label>
+            <Label for="repeat-password">Repeat password <span class="text-red-500">*</span></Label>
           </div>
           <div class="relative">
             <Input

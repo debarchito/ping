@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function isValidUsername(username: string) {
-  return username.length >= 3 && username.length <= 32 && /^[a-z0-9_-]+$/.test(username);
+  return isValidRoomname(username) && /^[a-z0-9_-]+$/.test(username);
 }
 
 export function isValidPassword(password: string) {
@@ -17,6 +17,10 @@ export function isValidPassword(password: string) {
     /[0-9]/.test(password) &&
     /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)
   );
+}
+
+export function isValidRoomname(roomname: string) {
+  return roomname.length >= 3 && roomname.length <= 32;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

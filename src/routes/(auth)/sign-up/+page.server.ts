@@ -8,13 +8,18 @@ import { db } from "$lib/server/db";
 
 export const load: PageServerLoad = async ({ locals }) => {
   if (locals.session) {
-    return redirect(302, "/new");
+    return redirect(302, "/room");
   }
+
   return {};
 };
 
 export const actions: Actions = {
   "sign-up": async (event) => {
+    if (event.locals.session) {
+      return fail(405, { message: "Method Not Allowed" });
+    }
+
     const formData = await event.request.formData();
     const username = formData.get("username");
     const password = formData.get("password");
@@ -53,8 +58,8 @@ export const actions: Actions = {
 
       await db.insert(table.user).values({
         id: userId,
-        username: username,
-        passwordHash: passwordHash,
+        username,
+        passwordHash,
       });
 
       const token = auth.generateSessionToken();
@@ -66,6 +71,6 @@ export const actions: Actions = {
       return fail(500, { message: "Oops...something went wrong" });
     }
 
-    return redirect(302, "/new");
+    return redirect(302, "/room");
   },
 };
