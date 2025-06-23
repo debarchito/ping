@@ -4,12 +4,7 @@ args = ["--stdio"]
 
 [[language]]
 name = "svelte"
-formatter = { command = "prettier", args = [
-    "--plugin",
-    "prettier-plugin-svelte",
-    "--parser",
-    "svelte",
-] }
+formatter = { command = "prettier", args = ["--parser", "svelte"] }
 auto-format = true
 language-servers = ["svelteserver", "tailwindcss"]
 
