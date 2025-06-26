@@ -13,7 +13,7 @@
 </script>
 
 <svelte:head>
-  <title>Sign In | ping.</title>
+  <title>Sign in | ping.</title>
 </svelte:head>
 
 <div class="flex flex-col gap-6">

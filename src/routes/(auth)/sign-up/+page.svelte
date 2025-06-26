@@ -19,7 +19,7 @@
 </script>
 
 <svelte:head>
-  <title>Sign Up | ping.</title>
+  <title>Sign up | ping.</title>
 </svelte:head>
 
 <div class="flex flex-col gap-6">

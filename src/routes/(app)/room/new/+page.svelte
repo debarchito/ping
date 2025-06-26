@@ -17,60 +17,73 @@
   <title>Create a New Room | ping.</title>
 </svelte:head>
 
-<div class="flex h-screen w-full items-center justify-center px-4">
-  <Card.Root class="md:min-w-sm">
-    <Card.Header>
-      <Card.Title class="text-2xl">Create a New Room</Card.Title>
-      <Card.Description>Enter the details to create a room</Card.Description>
-    </Card.Header>
+<div class="flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
+  <div class="flex w-full max-w-sm flex-col gap-6">
+    <a
+      href="/"
+      class="font-ms-madi flex items-center gap-2 self-center text-6xl font-medium select-none"
+    >
+      <div
+        class="bg-primary text-primary-foreground flex size-8 transform items-center justify-center rounded-full shadow-md transition-transform duration-200 hover:scale-105"
+      ></div>
+      <span class="mr-4 mb-4">ping.</span>
+    </a>
 
-    <Card.Content>
-      <div class="grid gap-4">
-        <Alert.Root class="mb-6">
-          <CircleAlert />
-          <Alert.Title>Rooms are public and unencrypted!</Alert.Title>
-          <Alert.Description>Do not share any sensitive information</Alert.Description>
-        </Alert.Root>
-      </div>
+    <div class="flex flex-col gap-6">
+      <Card.Root class="md:min-w-sm">
+        <Card.Header class="text-center">
+          <Card.Title class="text-2xl">A new room, a new story</Card.Title>
+          <Card.Description>What should we call this new room?</Card.Description>
+        </Card.Header>
 
-      <div class="grid gap-4">
-        <form class="grid gap-4" method="POST" action="?/create-room" use:enhance>
-          <div class="grid gap-2">
-            <Label for="roomname">What should we call it? <span class="text-red-500">*</span></Label
-            >
-            <Input
-              id="roomname"
-              type="roomname"
-              name="roomname"
-              placeholder="Jane Cooks!"
-              required
-            />
+        <Card.Content>
+          <div class="grid gap-4">
+            <Alert.Root variant="destructive" class="mb-6">
+              <CircleAlert />
+              <Alert.Title>Rooms are public and unencrypted!</Alert.Title>
+              <Alert.Description>Do not share any sensitive information</Alert.Description>
+            </Alert.Root>
           </div>
 
-          <div class="grid gap-2">
-            <Label for="room-description">
-              What is this room about? <span class="text-red-500">*</span>
-            </Label>
-            <Textarea
-              id="room-description"
-              bind:value={description}
-              name="room-description"
-              placeholder="A room to share Jane's best recipes!"
-              class="max-h-50"
-              maxlength={descriptionMaxLength}
-              required
-            />
-            <span class="ml-auto text-right text-sm"
-              >{descriptionLength} / {descriptionMaxLength}</span
-            >
-          </div>
+          <div class="grid gap-4">
+            <form class="grid gap-4" method="POST" action="?/create-room" use:enhance>
+              <div class="grid gap-2">
+                <Label for="roomname">Name</Label>
+                <Input
+                  id="roomname"
+                  type="roomname"
+                  name="roomname"
+                  placeholder="Kitty"
+                  spellcheck="false"
+                  required
+                />
+              </div>
 
-          <Button type="submit" class="w-full">
-            <BadgePlus />
-            Create Room
-          </Button>
-        </form>
-      </div>
-    </Card.Content>
-  </Card.Root>
+              <div class="grid gap-2">
+                <Label for="room-description">Description</Label>
+                <Textarea
+                  id="room-description"
+                  bind:value={description}
+                  name="room-description"
+                  placeholder="Everything about cats..!"
+                  class="max-h-50"
+                  maxlength={descriptionMaxLength}
+                  spellcheck="false"
+                  required
+                />
+                <span class="ml-auto text-right text-sm"
+                  >{descriptionLength} / {descriptionMaxLength}</span
+                >
+              </div>
+
+              <Button type="submit" class="w-full">
+                <BadgePlus />
+                Create Room
+              </Button>
+            </form>
+          </div>
+        </Card.Content>
+      </Card.Root>
+    </div>
+  </div>
 </div>
