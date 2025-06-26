@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@fontsource/ms-madi':
+        specifier: ^5.2.6
+        version: 5.2.6
       '@node-rs/argon2':
         specifier: ^2.0.2
         version: 2.0.2
@@ -623,6 +626,9 @@ packages:
 
   '@floating-ui/utils@0.2.9':
     resolution: {integrity: sha512-MDWhGtE+eHw5JW7lq4qhc5yRLS11ERl1c7Z6Xd0a58DozHES6EnNNwUWbMiG4J9Cgj053Bhk8zvlhFYKVhULwg==}
+
+  '@fontsource/ms-madi@5.2.6':
+    resolution: {integrity: sha512-tOGSu89wz9UAeAfx0+Qr5xNSlCUeByiQslMbjuGK1DnJRw8Xqle6gkSzfj6npQ67uZcmvVk+ZYP+lo4Z8xdqiQ==}
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -2509,6 +2515,8 @@ snapshots:
       '@floating-ui/utils': 0.2.9
 
   '@floating-ui/utils@0.2.9': {}
+
+  '@fontsource/ms-madi@5.2.6': {}
 
   '@humanfs/core@0.19.1': {}
 
