@@ -6,7 +6,7 @@
   import { Label } from "$lib/components/ui/label/index.js";
   import * as Alert from "$lib/components/ui/alert/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
-  import { TicketCheck, TriangleAlert, Eye, EyeClosed } from "@lucide/svelte";
+  import { Check, TriangleAlert, Eye, EyeClosed } from "@lucide/svelte";
 
   let { form }: { form: ActionData } = $props();
   let password = $state("");
@@ -22,94 +22,103 @@
   <title>Sign Up | ping.</title>
 </svelte:head>
 
-<Card.Root class="md:min-w-sm">
-  <Card.Header>
-    <Card.Title class="text-2xl">Sign Up</Card.Title>
-    <Card.Description>Enter your username to sign up for an account</Card.Description>
-  </Card.Header>
+<div class="flex flex-col gap-6">
+  <Card.Root class="md:min-w-sm">
+    <Card.Header class="text-center">
+      <Card.Title class="text-2xl">Let's get you there</Card.Title>
+      <Card.Description>Sign up using a username</Card.Description>
+    </Card.Header>
 
-  <Card.Content>
-    <div class="grid gap-4">
-      <form class="grid gap-4" method="POST" action="?/sign-up" use:enhance>
-        <div class="grid gap-2">
-          <Label for="username">Username <span class="text-red-500">*</span></Label>
-          <Input id="username" type="username" name="username" placeholder="janedoe" required />
-        </div>
-
-        <div class="grid gap-2">
-          <div class="flex items-center">
-            <Label for="password">Password <span class="text-red-500">*</span></Label>
-          </div>
-          <div class="relative">
+    <Card.Content>
+      <div class="grid gap-4">
+        <form class="grid gap-4" method="POST" action="?/sign-up" use:enhance>
+          <div class="grid gap-2">
+            <Label for="username">Username</Label>
             <Input
-              id="password"
-              bind:value={password}
-              type={showPassword ? "text" : "password"}
-              name="password"
-              placeholder="~!@#$%^"
-              class={passwordMismatch ? "border-red-500" : ""}
+              id="username"
+              type="username"
+              name="username"
+              placeholder="janedoe"
+              spellcheck="false"
               required
             />
-            <button
-              type="button"
-              class="absolute top-1/2 right-2 -translate-y-1/2"
-              onclick={() => (showPassword = !showPassword)}
-            >
-              {#if showPassword}
-                <EyeClosed />
-              {:else}
-                <Eye />
-              {/if}
-            </button>
           </div>
+
+          <div class="grid gap-2">
+            <div class="flex items-center">
+              <Label for="password">Password</Label>
+            </div>
+            <div class="relative">
+              <Input
+                id="password"
+                bind:value={password}
+                type={showPassword ? "text" : "password"}
+                name="password"
+                class={passwordMismatch ? "border-red-500" : ""}
+                spellcheck="false"
+                required
+              />
+              <button
+                type="button"
+                class="absolute top-1/2 right-2 -translate-y-1/2"
+                onclick={() => (showPassword = !showPassword)}
+              >
+                {#if showPassword}
+                  <EyeClosed />
+                {:else}
+                  <Eye />
+                {/if}
+              </button>
+            </div>
+          </div>
+
+          <div class="grid gap-2">
+            <div class="flex items-center">
+              <Label for="repeat-password">Repeat password</Label>
+            </div>
+            <div class="relative">
+              <Input
+                id="repeat-password"
+                bind:value={repeatPassword}
+                type={showRepeatPassword ? "text" : "password"}
+                class={passwordMismatch ? "border-red-500" : ""}
+                spellcheck="false"
+                required
+              />
+              <button
+                type="button"
+                class="absolute top-1/2 right-2 -translate-y-1/2"
+                onclick={() => (showRepeatPassword = !showRepeatPassword)}
+              >
+                {#if showRepeatPassword}
+                  <EyeClosed />
+                {:else}
+                  <Eye />
+                {/if}
+              </button>
+            </div>
+          </div>
+
+          <Button type="submit" class="w-full" disabled={passwordMismatch}>
+            <Check />
+            Sign Up
+          </Button>
+        </form>
+
+        {#if form?.message}
+          <Alert.Root variant="destructive">
+            <TriangleAlert />
+            <Alert.Description class="max-w-70">
+              <span>{form?.message}</span>
+            </Alert.Description>
+          </Alert.Root>
+        {/if}
+
+        <div class="mt-4 text-center text-sm">
+          Already have an account?
+          <a href="/sign-in" class="underline">Sign in</a>
         </div>
-
-        <div class="grid gap-2">
-          <div class="flex items-center">
-            <Label for="repeat-password">Repeat password <span class="text-red-500">*</span></Label>
-          </div>
-          <div class="relative">
-            <Input
-              id="repeat-password"
-              bind:value={repeatPassword}
-              type={showRepeatPassword ? "text" : "password"}
-              placeholder="~!@#$%^"
-              class={passwordMismatch ? "border-red-500" : ""}
-              required
-            />
-            <button
-              type="button"
-              class="absolute top-1/2 right-2 -translate-y-1/2"
-              onclick={() => (showRepeatPassword = !showRepeatPassword)}
-            >
-              {#if showRepeatPassword}
-                <EyeClosed />
-              {:else}
-                <Eye />
-              {/if}
-            </button>
-          </div>
-        </div>
-
-        <Button type="submit" class="w-full" disabled={passwordMismatch}>
-          <TicketCheck />
-          Sign Up
-        </Button>
-      </form>
-
-      {#if form?.message}
-        <Alert.Root variant="destructive">
-          <TriangleAlert />
-          <Alert.Description class="max-w-70">
-            <span>{form?.message}</span>
-          </Alert.Description>
-        </Alert.Root>
-      {/if}
-
-      <div class="mt-4 text-center text-sm">
-        Already have an account?
-        <a href="/sign-in" class="underline">Sign In!</a>
       </div>
-    </div>
-  </Card.Content>
-</Card.Root>
+    </Card.Content>
+  </Card.Root>
+</div>
