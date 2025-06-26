@@ -20,7 +20,7 @@
         {
           devShells.default = pkgs.mkShellNoCC {
             packages = [
-              pkgs.nodejs-slim
+              pkgs.nodejs-slim_24
               pkgs.pnpm
               pkgs.svelte-language-server
               pkgs.typescript-language-server
