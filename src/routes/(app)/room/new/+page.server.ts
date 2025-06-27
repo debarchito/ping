@@ -1,13 +1,10 @@
 import type { PageServerLoad, Actions } from "./$types";
-import * as table from "$lib/server/db/schema.js";
 import { redirect, fail } from "@sveltejs/kit";
-import { isValidRoomname } from "$lib/utils";
-import * as auth from "$lib/server/auth";
-import { db } from "$lib/server/db";
+import { isValidName } from "$lib/utils";
 
 export const load: PageServerLoad = async ({ locals }) => {
-  if (!locals.session) {
-    return redirect(302, "/sign-in");
+  if (!locals.user) {
+    return redirect(307, "/sign-in");
   }
 
   return {};
@@ -15,7 +12,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 export const actions: Actions = {
   "create-room": async (event) => {
-    if (!event.locals.session) {
+    if (!event.locals.user) {
       return fail(403, { message: "Method Not Allowed" });
     }
 
@@ -33,9 +30,9 @@ export const actions: Actions = {
       return fail(400, { message: "Roomname and room description required and must be strings" });
     }
 
-    if (!isValidRoomname(roomname)) {
+    if (!isValidName(roomname)) {
       return fail(400, {
-        message: "Roomname must be 3 to 32 chars",
+        message: "Roomname must be 3 to 64 chars",
       });
     }
 
@@ -46,27 +43,26 @@ export const actions: Actions = {
     }
 
     try {
-      const room = await db.query.room.findFirst({
-        where: (table, { eq }) => eq(table.roomname, roomname),
+      const existingRooms = await event.locals.pb.collection("rooms").getList(1, 1, {
+        filter: `name = "${roomname}"`,
       });
 
-      if (room) {
+      if (existingRooms.items.length > 0) {
         return fail(400, { message: "A room with this roomname already exists" });
       }
 
-      roomId = auth.generateSessionToken();
-
-      await db.insert(table.room).values({
-        id: roomId,
-        userId: event.locals.session.userId,
-        roomname,
+      const room = await event.locals.pb.collection("rooms").create({
+        userId: event.locals.user.id,
+        name: roomname,
         description: roomDescription,
       });
+
+      roomId = room.id;
     } catch (err) {
-      console.log("[! /new] =>", err);
+      console.log("[! /room/new] =>", err);
       return fail(500, { message: "Oops...something went wrong" });
     }
 
-    return redirect(302, `/room/${roomId}`);
+    return redirect(307, `/room/${roomId}`);
   },
 };

@@ -1,13 +1,15 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import type { ActionData } from "./$types";
   import * as Card from "$lib/components/ui/card/index.js";
   import { Input } from "$lib/components/ui/input/index.js";
   import { Textarea } from "$lib/components/ui/textarea/index.js";
   import { Label } from "$lib/components/ui/label/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
-  import { BadgePlus, CircleAlert } from "@lucide/svelte";
+  import { BadgePlus, TriangleAlert, CircleAlert } from "@lucide/svelte";
   import * as Alert from "$lib/components/ui/alert/index.js";
 
+  let { form }: { form: ActionData } = $props();
   let description = $state("");
   let descriptionLength = $derived(description.length);
   let descriptionMaxLength = $state(200);
@@ -53,7 +55,7 @@
                   id="roomname"
                   type="roomname"
                   name="roomname"
-                  placeholder="Kitty"
+                  placeholder="kitty"
                   spellcheck="false"
                   required
                 />
@@ -81,6 +83,15 @@
                 Create Room
               </Button>
             </form>
+
+            {#if form?.message}
+              <Alert.Root variant="destructive">
+                <TriangleAlert />
+                <Alert.Description class="max-w-70">
+                  <span>{form?.message}</span>
+                </Alert.Description>
+              </Alert.Root>
+            {/if}
           </div>
         </Card.Content>
       </Card.Root>

@@ -1,4 +1,4 @@
-import { isValidUsername, isValidPassword } from "$lib/utils";
+import { isValidName, isValidPassword } from "$lib/utils";
 import type { PageServerLoad, Actions } from "./$types";
 import { redirect, fail } from "@sveltejs/kit";
 import isEmail from "validator/lib/isEmail";
@@ -41,7 +41,7 @@ export const actions: Actions = {
       });
     }
 
-    if (!isValidUsername(username)) {
+    if (!isValidName(username)) {
       return fail(400, {
         message: "Username must be 3 to 32 chars and only use a-z, 0-9, _ or -",
       });
