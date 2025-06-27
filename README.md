@@ -113,4 +113,4 @@ the migrations and **ping.** should be ready to use!
 
 ### 4. License
 
-This project is licensed under [GNU General Public License v3.0](/LICENSE).
+This project is licensed under [zlib License](/LICENSE).
