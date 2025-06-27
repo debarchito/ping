@@ -1,6 +1,6 @@
-import { isValidUsername, isValidPassword } from "$lib/utils";
 import type { PageServerLoad, Actions } from "./$types";
 import { redirect, fail } from "@sveltejs/kit";
+import { isValidPassword } from "$lib/utils";
 import isEmail from "validator/lib/isEmail";
 
 export const load: PageServerLoad = async ({ locals }) => {

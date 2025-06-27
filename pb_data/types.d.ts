@@ -97,7 +97,7 @@ declare function routerUse(
  *
  * @group PocketBase
  */
-declare var __hooks: string;
+declare let __hooks: string;
 
 // Utility type to exclude the on* hook methods from a type
 // (hooks are separately generated as global methods).
@@ -122,7 +122,7 @@ type PocketBase = excludeHooks<pocketbase.PocketBase>;
  * @namespace
  * @group PocketBase
  */
-declare var $app: PocketBase;
+declare let $app: PocketBase;
 
 /**
  * `$template` is a global helper to load and cache HTML templates on the fly.
@@ -144,7 +144,7 @@ declare var $app: PocketBase;
  * @namespace
  * @group PocketBase
  */
-declare var $template: template.Registry;
+declare let $template: template.Registry;
 
 /**
  * This method is superseded by toString.

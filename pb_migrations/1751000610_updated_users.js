@@ -1,4 +1,4 @@
-/// <reference path="../pb_data/types.d.ts" />
+/** @type {import("../pb_data/types") */
 migrate(
   (app) => {
     const collection = app.findCollectionByNameOrId("_pb_users_auth_");
