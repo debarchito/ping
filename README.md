@@ -1,5 +1,7 @@
 <img src="static/logo.png" alt="ping." width="150">
 
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
 **ping.** is a simple reference chat application built on top of
 [PocketBase](https://pocketbase.io). It implements public _real-time rooms_
 (powered by
