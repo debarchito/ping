@@ -1,38 +1,112 @@
-# sv
+## ping.
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+**ping.** is a simple reference chat application built on top of
+[PocketBase](https://pocketbase.io). It implements public _real-time rooms_
+(powered by
+[PocketBase's Realtime API](https://pocketbase.io/docs/api-realtime)) and _room
+discovery_ as part of it's feature set. As the project stands, **ping.** doesn't
+implement any form of encryption; all the messages are stored in plain text.
+**DO NOT** share any sensitive information on **ping.** instances unless you
+know you have full control over it (it's just better not to).
 
-## Creating a project
+### 1. Stack
 
-If you're seeing this, you've probably already done this step. Congrats!
+- [Svelte](https://svelte.dev/docs/svelte/overview),
+  [SvelteKit](https://svelte.dev/docs/kit/introduction),
+  [TypeScript](https://www.typescriptlang.org) for UI
+- [Tailwind CSS](https://tailwindcss.com),
+  [shadcn-svelte](https://shadcn-svelte.com) for UI design
+- [PocketBase](https://pocketbase.io) for real-time database, authentication,
+  and admin dashboard.
 
-```bash
-# create a new project in the current directory
-npx sv create
+### 2. Build (direnv)
 
-# create a new project in my-app
-npx sv create my-app
+> **NOTE:** The installation steps assume you are using a UNIX-like system. If
+> you are using Windows, use _WSL2_ to build and run this project.
+
+This project and it's dependencies can be scaffold with
+[direnv](https://direnv.net) using:
+
+```sh
+direnv allow
 ```
 
-## Developing
+Once the development shell is ready, we need to prepare the environment variable
+using:
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+```sh
+cp .env.example .env
+# By default, PocketBase will listen on port 8090 and the default value of
+# POCKETBASE_URL is set to http://0.0.0.0:8090. Adjust it if you need to.
 ```
 
-## Building
+Once done, direnv should automatically load the environment variable. Now, build
+**ping.** using:
 
-To create a production version of your app:
-
-```bash
-npm run build
+```sh
+pnpm install && pnpm build
 ```
 
-You can preview the production build with `npm run preview`.
+Once built, run **ping.** using:
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+```sh
+pnpm start
+```
+
+When running for the first time, you'll be asked to create a PocketBase
+_superuser account_. Once done, PocketBase should automatically run the
+migrations and **ping.** should be ready to use!
+
+### 3. Build (standard)
+
+Install [pnpm](https://pnpm.io) globally using either _curl_ or _wget_. You can
+also use _npm_, _yarn_ or some other package manager if you prefer.
+
+```sh
+curl -fsSL https://get.pnpm.io/install.sh | sh -
+# or
+wget -qO- https://get.pnpm.io/install.sh | sh -
+```
+
+Install _Node.js v24_ using:
+
+```sh
+pnpm env use --global 24
+```
+
+Install PocketBase by following the official documentation at
+[https://pocketbase.io/docs](https://pocketbase.io/docs). Do not forget to add
+the PocketBase binary to your PATH. Now, we need to prepare the environment
+variable using:
+
+```sh
+cp .env.example .env
+# By default, PocketBase will listen on port 8090 and the default value of
+# POCKETBASE_URL is set to http://0.0.0.0:8090. Adjust it if you need to.
+```
+
+Load the environment variable using:
+
+```
+source .env
+```
+
+Once done, build **ping.** using:
+
+```sh
+pnpm install && pnpm build
+```
+
+Once built, run **ping.** using:
+
+```sh
+pnpm start
+```
+
+Similarly, when running for the first time, you'll be asked to create a
+PocketBase _superuser account_. Once done, PocketBase should automatically run
+the migrations and **ping.** should be ready to use!
+
+### 4. License
+
+This project is licensed under [GNU General Public License v3.0](/LICENSE).

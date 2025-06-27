@@ -1,6 +1,8 @@
 words = [
     "bundler",
+    "cadd",
     "clsx",
+    "direnv",
     "dlx",
     "fontsource",
     "lucide",
@@ -9,4 +11,6 @@ words = [
     "shadcn",
     "sveltejs",
     "vite",
+    "wget",
+    "wsl",
 ]
