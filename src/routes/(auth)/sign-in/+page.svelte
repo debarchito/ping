@@ -20,19 +20,19 @@
   <Card.Root class="md:min-w-sm">
     <Card.Header class="text-center">
       <Card.Title class="text-2xl">Welcome back</Card.Title>
-      <Card.Description>Sign in with your username</Card.Description>
+      <Card.Description>Sign in with your email</Card.Description>
     </Card.Header>
 
     <Card.Content>
       <div class="grid gap-4">
         <form class="grid gap-4" method="POST" action="?/sign-in" use:enhance>
           <div class="grid gap-2">
-            <Label for="username">Username</Label>
+            <Label for="email">Email</Label>
             <Input
-              id="username"
-              type="username"
-              name="username"
-              placeholder="janedoe"
+              id="email"
+              type="email"
+              name="email"
+              placeholder="me@janedoe.com"
               spellcheck="false"
               required
             />

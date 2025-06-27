@@ -22,6 +22,7 @@
             packages = [
               pkgs.nodejs-slim_24
               pkgs.pnpm
+              pkgs.pocketbase
               pkgs.svelte-language-server
               pkgs.typescript-language-server
               pkgs.tailwindcss-language-server

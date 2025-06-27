@@ -1,13 +1,10 @@
 import { isValidUsername, isValidPassword } from "$lib/utils";
 import type { PageServerLoad, Actions } from "./$types";
-import * as table from "$lib/server/db/schema.js";
 import { redirect, fail } from "@sveltejs/kit";
-import * as auth from "$lib/server/auth";
-import { hash } from "@node-rs/argon2";
-import { db } from "$lib/server/db";
+import isEmail from "validator/lib/isEmail";
 
 export const load: PageServerLoad = async ({ locals }) => {
-  if (locals.session) {
+  if (locals.user) {
     return redirect(302, "/room");
   }
 
@@ -16,16 +13,32 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 export const actions: Actions = {
   "sign-up": async (event) => {
-    if (event.locals.session) {
+    if (event.locals.user) {
       return fail(405, { message: "Method Not Allowed" });
     }
 
     const formData = await event.request.formData();
+    const email = formData.get("email");
     const username = formData.get("username");
     const password = formData.get("password");
 
-    if (!username || !password || typeof username !== "string" || typeof password !== "string") {
-      return fail(400, { message: "Username and password are required and must be strings" });
+    if (
+      !email ||
+      !username ||
+      !password ||
+      typeof email !== "string" ||
+      typeof username !== "string" ||
+      typeof password !== "string"
+    ) {
+      return fail(400, {
+        message: "Email, username and password are required and must be strings",
+      });
+    }
+
+    if (!isEmail(email)) {
+      return fail(400, {
+        message: "Invalid email",
+      });
     }
 
     if (!isValidUsername(username)) {
@@ -42,35 +55,21 @@ export const actions: Actions = {
     }
 
     try {
-      const user = await db.query.user.findFirst({
-        where: (table, { eq }) => eq(table.username, username),
+      await event.locals.pb.collection("users").create({
+        name: username,
+        password,
+        passwordConfirm: password,
+        email,
       });
-
-      if (user) {
-        return fail(400, { message: "A user with this username already exists" });
-      }
-
-      const userId = auth.generateSessionToken();
-      const passwordHash = await hash(password, {
-        memoryCost: 19456,
-        timeCost: 2,
-      });
-
-      await db.insert(table.user).values({
-        id: userId,
-        username,
-        passwordHash,
-      });
-
-      const token = auth.generateSessionToken();
-      const session = await auth.createSession(token, userId);
-
-      auth.setSessionTokenCookie(event, token, session.expiresAt);
-    } catch (err) {
+      await event.locals.pb.collection("users").authWithPassword(email, password);
+    } catch (err: unknown) {
       console.log("[! /sign-up] =>", err);
+      if (typeof err === "object" && err !== null && "status" in err && err.status === 400) {
+        return fail(400, { message: "Invalid credentials" });
+      }
       return fail(500, { message: "Oops...something went wrong" });
     }
 
-    return redirect(302, "/room");
+    return redirect(307, "/room");
   },
 };

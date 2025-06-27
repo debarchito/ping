@@ -26,17 +26,29 @@
   <Card.Root class="md:min-w-sm">
     <Card.Header class="text-center">
       <Card.Title class="text-2xl">Let's get you there</Card.Title>
-      <Card.Description>Sign up using a username</Card.Description>
+      <Card.Description>Sign up using an email and username</Card.Description>
     </Card.Header>
 
     <Card.Content>
       <div class="grid gap-4">
         <form class="grid gap-4" method="POST" action="?/sign-up" use:enhance>
           <div class="grid gap-2">
+            <Label for="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              name="email"
+              placeholder="me@janedoe.com"
+              spellcheck="false"
+              required
+            />
+          </div>
+
+          <div class="grid gap-2">
             <Label for="username">Username</Label>
             <Input
               id="username"
-              type="username"
+              type="text"
               name="username"
               placeholder="janedoe"
               spellcheck="false"

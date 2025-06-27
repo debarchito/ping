@@ -1,26 +1,30 @@
 import type { Handle } from "@sveltejs/kit";
-import * as auth from "$lib/server/auth";
+import { env } from "$env/dynamic/private";
+import PocketBase from "pocketbase";
 
-const handleAuth: Handle = async ({ event, resolve }) => {
-  const sessionToken = event.cookies.get(auth.sessionCookieName);
+export const handle: Handle = async ({ event, resolve }) => {
+  event.locals.pb = new PocketBase(env.POCKETBASE_URL);
+  event.locals.pb.authStore.loadFromCookie(event.request.headers.get("cookie") || "");
+  const record = event.locals.pb.authStore.record;
 
-  if (!sessionToken) {
+  try {
+    if (event.locals.pb.authStore.isValid) {
+      await event.locals.pb.collection("users").authRefresh();
+      event.locals.user = structuredClone(record);
+    }
+  } catch {
+    event.locals.pb.authStore.clear();
     event.locals.user = null;
-    event.locals.session = null;
-    return resolve(event);
   }
 
-  const { session, user } = await auth.validateSessionToken(sessionToken);
+  const response = await resolve(event);
+  // TODO: secure this in production
+  response.headers.set(
+    "set-cookie",
+    event.locals.pb.authStore.exportToCookie({
+      secure: false,
+    }),
+  );
 
-  if (session) {
-    auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
-  } else {
-    auth.deleteSessionTokenCookie(event);
-  }
-
-  event.locals.user = user;
-  event.locals.session = session;
-  return resolve(event);
+  return response;
 };
-
-export const handle: Handle = handleAuth;
