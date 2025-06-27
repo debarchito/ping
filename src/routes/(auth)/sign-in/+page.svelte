@@ -64,7 +64,7 @@
             </div>
           </div>
 
-          <Button type="submit" class="w-full">
+          <Button type="submit" class="w-full transition-all hover:scale-105">
             <LogIn />
             Sign In
           </Button>

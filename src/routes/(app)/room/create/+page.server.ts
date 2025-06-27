@@ -59,7 +59,7 @@ export const actions: Actions = {
 
       roomId = room.id;
     } catch (err) {
-      console.log("[! /room/new] =>", err);
+      console.log("[! /room/create] =>", err);
       return fail(500, { message: "Oops...something went wrong" });
     }
 

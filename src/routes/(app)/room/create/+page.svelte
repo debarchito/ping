@@ -6,7 +6,7 @@
   import { Textarea } from "$lib/components/ui/textarea/index.js";
   import { Label } from "$lib/components/ui/label/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
-  import { BadgePlus, TriangleAlert, CircleAlert } from "@lucide/svelte";
+  import { BadgePlus, TriangleAlert, CircleAlert, BellDot } from "@lucide/svelte";
   import * as Alert from "$lib/components/ui/alert/index.js";
 
   let { form }: { form: ActionData } = $props();
@@ -16,7 +16,7 @@
 </script>
 
 <svelte:head>
-  <title>Create a New Room | ping.</title>
+  <title>Create a new Room | ping.</title>
 </svelte:head>
 
 <div class="flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
@@ -27,7 +27,9 @@
     >
       <div
         class="bg-primary text-primary-foreground flex size-8 transform items-center justify-center rounded-full shadow-md transition-transform duration-200 hover:scale-105"
-      ></div>
+      >
+        <BellDot class="size-5" />
+      </div>
       <span class="mr-4 mb-4">ping.</span>
     </a>
 
@@ -78,7 +80,7 @@
                 >
               </div>
 
-              <Button type="submit" class="w-full">
+              <Button type="submit" class="w-full transition-all hover:scale-105">
                 <BadgePlus />
                 Create Room
               </Button>
@@ -92,6 +94,11 @@
                 </Alert.Description>
               </Alert.Root>
             {/if}
+
+            <div class="mt-4 text-center text-sm">
+              Feeling adventurous?
+              <a href="/rooms" class="underline">Explore rooms</a>
+            </div>
           </div>
         </Card.Content>
       </Card.Root>

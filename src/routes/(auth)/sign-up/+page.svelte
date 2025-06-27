@@ -111,7 +111,11 @@
             </div>
           </div>
 
-          <Button type="submit" class="w-full" disabled={passwordMismatch}>
+          <Button
+            type="submit"
+            class="w-full transition-all hover:scale-105"
+            disabled={passwordMismatch}
+          >
             <Check />
             Sign Up
           </Button>

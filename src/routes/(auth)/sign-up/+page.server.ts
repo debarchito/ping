@@ -5,7 +5,7 @@ import isEmail from "validator/lib/isEmail";
 
 export const load: PageServerLoad = async ({ locals }) => {
   if (locals.user) {
-    return redirect(302, "/room");
+    return redirect(302, "/rooms");
   }
 
   return {};
@@ -70,6 +70,6 @@ export const actions: Actions = {
       return fail(500, { message: "Oops...something went wrong" });
     }
 
-    return redirect(307, "/room");
+    return redirect(307, "/rooms");
   },
 };
