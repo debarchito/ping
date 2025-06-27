@@ -4,10 +4,10 @@
   "description": "A simple reference chat application built on top of PocketBase",
   "type": "module",
   "scripts": {
-    "start": "pocketbase serve & node build",
-    "dev": "pocketbase serve & vite dev",
+    "start": "pocketbase serve --http=$POCKETBASE_HOST:$POCKETBASE_PORT & node build",
+    "dev": "pocketbase serve --http=$POCKETBASE_HOST:$POCKETBASE_PORT & vite dev",
     "build": "vite build",
-    "preview": "pocketbase serve & vite preview",
+    "preview": "pocketbase serve --http=$POCKETBASE_HOST:$POCKETBASE_PORT & vite preview",
     "prepare": "svelte-kit sync || echo ''",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",

@@ -6,10 +6,9 @@
 [PocketBase](https://pocketbase.io). It implements public _real-time rooms_
 (powered by
 [PocketBase's Realtime API](https://pocketbase.io/docs/api-realtime)) and _room
-discovery_ as part of it's feature set. As the project stands, **ping.** doesn't
-implement any form of encryption; all the messages are stored in plain text.
-**DO NOT** share any sensitive information on **ping.** instances unless you
-know you have full control over it (it's just better not to).
+discovery_ as part of it's feature set. **ping.** doesn't implement any form of
+encryption; all the messages are stored in plain text. **DO NOT** share any
+sensitive information on **ping.** instances.
 
 ### 1. Stack
 
@@ -33,17 +32,19 @@ This project and it's dependencies can be scaffold with
 direnv allow
 ```
 
-Once the development shell is ready, we need to prepare the environment variable
-using:
+Once the development shell is ready, we need to prepare the environment
+variables using:
 
 ```sh
 cp .env.example .env
-# By default, PocketBase will listen on port 8090 and the default value of
-# POCKETBASE_URL is set to http://0.0.0.0:8090. Adjust it if you need to.
+# POCKETBASE_HOST (default: 0.0.0.0)
+# POCKETBASE_PORT (default: 8090)
+# POCKETBASE_URL (default: http://$POCKETBASE_HOST:$POCKETBASE_PORT)
+# All three are required. Adjust them as per your requirement.
 ```
 
-Once done, direnv should automatically load the environment variable. Now, build
-**ping.** using:
+Once done, direnv should automatically load the environment variables. Now,
+build **ping.** using:
 
 ```sh
 pnpm install && pnpm build
@@ -78,15 +79,17 @@ pnpm env use --global 24
 Install PocketBase by following the official documentation at
 [https://pocketbase.io/docs](https://pocketbase.io/docs). Do not forget to add
 the PocketBase binary to your PATH. Now, we need to prepare the environment
-variable using:
+variables using:
 
 ```sh
 cp .env.example .env
-# By default, PocketBase will listen on port 8090 and the default value of
-# POCKETBASE_URL is set to http://0.0.0.0:8090. Adjust it if you need to.
+# POCKETBASE_HOST (default: 0.0.0.0)
+# POCKETBASE_PORT (default: 8090)
+# POCKETBASE_URL (default: http://$POCKETBASE_HOST:$POCKETBASE_PORT)
+# All three are required. Adjust them as per your requirement.
 ```
 
-Load the environment variable using:
+Load the environment variables using:
 
 ```
 source .env
