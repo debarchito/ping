@@ -1,4 +1,4 @@
-## ping.
+<img src="static/logo.png" alt="ping." width="150">
 
 **ping.** is a simple reference chat application built on top of
 [PocketBase](https://pocketbase.io). It implements public _real-time rooms_
