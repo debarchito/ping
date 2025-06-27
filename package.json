@@ -4,16 +4,16 @@
   "description": "A simple reference chat application built on top of PocketBase",
   "type": "module",
   "scripts": {
-    "dev": "vite dev",
+    "start": "pocketbase serve & node build",
+    "dev": "pocketbase serve & vite dev",
     "build": "vite build",
-    "preview": "vite preview",
+    "preview": "pocketbase serve & vite preview",
     "prepare": "svelte-kit sync || echo ''",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "format": "prettier --write .",
     "lint": "prettier --check . && eslint .",
-    "db:up": "pocketbase serve",
-    "comp:add": "pnpm dlx shadcn-svelte@latest add"
+    "cadd": "pnpm dlx shadcn-svelte@latest add"
   },
   "devDependencies": {
     "@eslint/compat": "^1.3.1",
