@@ -11,48 +11,39 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-  "create-room": async (event) => {
-    if (!event.locals.user) {
-      return fail(403, { message: "Method Not Allowed" });
+  "create-room": async ({ locals, request }) => {
+    if (!locals.user) {
+      return fail(405, { message: "Method Not Allowed" });
     }
 
-    const formData = await event.request.formData();
-    const roomname = formData.get("roomname");
-    const roomDescription = formData.get("room-description");
+    const formData = await request.formData();
+    const roomname = formData.get("roomname")?.toString() || "";
+    const roomDescription = formData.get("room-description")?.toString() || "";
     let roomId: string;
-
-    if (
-      !roomname ||
-      !roomDescription ||
-      typeof roomname !== "string" ||
-      typeof roomDescription !== "string"
-    ) {
-      return fail(400, { message: "Roomname and room description required and must be strings" });
-    }
 
     if (!isValidName(roomname)) {
       return fail(400, {
-        message: "Roomname must be 3 to 64 chars",
+        message: "Room name must be 3 to 64 chars and only use a-z, 0-9, _ or -",
       });
     }
 
-    if (!(roomDescription.length <= 200)) {
+    if (!(roomDescription.length >= 1 && roomDescription.length <= 200)) {
       return fail(400, {
         message: "Room description can be at most 200 chars",
       });
     }
 
     try {
-      const existingRooms = await event.locals.pb.collection("rooms").getList(1, 1, {
+      const existingRoom = await locals.pb.collection("rooms").getList(1, 1, {
         filter: `name = "${roomname}"`,
       });
 
-      if (existingRooms.items.length > 0) {
-        return fail(400, { message: "A room with this roomname already exists" });
+      if (existingRoom.items.length > 0) {
+        return fail(400, { message: "A room with this name already exists" });
       }
 
-      const room = await event.locals.pb.collection("rooms").create({
-        userId: event.locals.user.id,
+      const room = await locals.pb.collection("rooms").create({
+        userId: locals.user.id,
         name: roomname,
         description: roomDescription,
       });
