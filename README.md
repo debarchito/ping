@@ -59,8 +59,7 @@ migrations and **ping.** should be ready to use!
 
 ### 3. Build (standard)
 
-Install [pnpm](https://pnpm.io) globally using either _curl_ or _wget_. You can
-also use _npm_, _yarn_ or some other package manager if you prefer.
+Install [pnpm](https://pnpm.io) globally using either _curl_ or _wget_.
 
 ```sh
 curl -fsSL https://get.pnpm.io/install.sh | sh -
