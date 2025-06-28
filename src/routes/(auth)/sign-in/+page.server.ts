@@ -3,8 +3,10 @@ import { redirect, fail } from "@sveltejs/kit";
 import { isValidPassword } from "$lib/utils";
 import isEmail from "validator/lib/isEmail";
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async ({ locals, url }) => {
   if (locals.user) {
+    const redirectTo = url.searchParams.get("redirectTo");
+    if (redirectTo) return redirect(307, `/${redirectTo.slice(1)}`);
     return redirect(307, "/rooms");
   }
 
@@ -12,7 +14,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-  "sign-in": async ({ locals, request }) => {
+  default: async ({ locals, request, url }) => {
     if (locals.user) {
       return fail(405, { message: "Method Not Allowed" });
     }
@@ -32,6 +34,8 @@ export const actions: Actions = {
       return fail(400, { message: "Invalid credentials" });
     }
 
+    const redirectTo = url.searchParams.get("redirectTo");
+    if (redirectTo) return redirect(307, `/${redirectTo.slice(1)}`);
     return redirect(307, "/rooms");
   },
 };

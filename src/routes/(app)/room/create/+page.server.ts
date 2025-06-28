@@ -1,10 +1,10 @@
+import { isValidName, redirectToMeOnSignIn } from "$lib/utils";
 import type { PageServerLoad, Actions } from "./$types";
 import { redirect, fail } from "@sveltejs/kit";
-import { isValidName } from "$lib/utils";
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async ({ locals, url }) => {
   if (!locals.user) {
-    return redirect(307, "/sign-in");
+    return redirect(307, redirectToMeOnSignIn(url));
   }
 
   return {};

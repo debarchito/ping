@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { PageProps } from "./$types";
   import { Button } from "$lib/components/ui/button";
+  import { Input } from "$lib/components/ui/input";
   import { Badge } from "$lib/components/ui/badge";
   import {
     Card,
@@ -89,10 +90,7 @@
         <span class="mr-2 mb-2 md:mr-4 md:mb-4">ping.</span>
       </a>
 
-      <Button
-        onclick={toggleMode}
-        class="text-accent-foreground hover:bg-muted size-8 cursor-pointer rounded-full border bg-transparent md:size-10"
-      >
+      <Button onclick={toggleMode} variant="outline" size="icon" class="rounded-full">
         {#if mode.current === "dark"}
           <Sun class="size-4 md:size-5" />
         {:else}
@@ -104,17 +102,18 @@
     <div class="flex flex-col gap-4">
       <div class="relative">
         <Search class="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
-        <input
+        <Input
           bind:value={searchQuery}
           onkeydown={handleKeydown}
           placeholder="Search rooms by name or description..."
-          class="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-12 w-full rounded-lg border py-2 pr-12 pl-10 text-sm transition-all focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+          class="h-12 pr-12 pl-10"
         />
         {#if searchQuery}
           <Button
             onclick={clearSearch}
-            class="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 size-6 -translate-y-1/2 rounded-full p-0 transition-colors"
             variant="ghost"
+            size="icon"
+            class="absolute top-1/2 right-3 size-6 -translate-y-1/2"
           >
             <X class="size-3" />
           </Button>
@@ -123,7 +122,7 @@
 
       <div class="flex items-center justify-between gap-4">
         <Button
-          class="bg-primary hover:bg-primary/90 text-primary-foreground flex flex-1 transform items-center justify-center shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl md:flex-none"
+          class="flex flex-1 transform items-center justify-center shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl md:flex-none"
         >
           <a href="/room/create" class="flex items-center gap-2">
             <Plus class="size-4" />
@@ -132,23 +131,20 @@
         </Button>
 
         <div class="flex flex-wrap items-center gap-2">
-          <div class="bg-background flex items-center gap-1 rounded-lg border p-1">
+          <div class="flex items-center gap-1 rounded-lg border p-1">
             <Button
               onclick={() => adjustPerPage(-1)}
               disabled={perPage <= 1}
-              class="hover:bg-muted size-8 rounded-md p-0 disabled:opacity-50"
               variant="ghost"
+              size="icon"
+              class="size-8"
             >
               <Minus class="size-3" />
             </Button>
             <span class="px-3 py-1 text-sm font-medium">
-              {perPage} results
+              {perPage} rooms
             </span>
-            <Button
-              onclick={() => adjustPerPage(1)}
-              class="hover:bg-muted size-8 rounded-md p-0"
-              variant="ghost"
-            >
+            <Button onclick={() => adjustPerPage(1)} variant="ghost" size="icon" class="size-8">
               <Plus class="size-3" />
             </Button>
           </div>

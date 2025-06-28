@@ -19,6 +19,10 @@ export function isValidDisplayname(roomname: string) {
   return roomname.length >= 3 && roomname.length <= 64;
 }
 
+export function redirectToMeOnSignIn(url: URL) {
+  return `/sign-in?redirectTo=${url.pathname + url.search}`;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type WithoutChild<T> = T extends { child?: any } ? Omit<T, "child"> : T;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

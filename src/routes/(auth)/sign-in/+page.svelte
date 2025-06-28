@@ -25,7 +25,7 @@
 
     <Card.Content>
       <div class="grid gap-4">
-        <form class="grid gap-4" method="POST" action="?/sign-in" use:enhance>
+        <form class="grid gap-4" method="POST" use:enhance>
           <div class="grid gap-2">
             <Label for="email">Email</Label>
             <Input

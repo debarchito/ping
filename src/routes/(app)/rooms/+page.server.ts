@@ -5,7 +5,9 @@ export const load: PageServerLoad = async ({ locals, url }) => {
   const perPage = Number(url.searchParams.get("n")) || 10;
   const search = url.searchParams.get("search") || "";
 
-  const filter = search ? `name~"${search}" || description~"${search}"` : "";
+  const filter = search
+    ? `name~"${search}" || displayName~"${search}" || description~"${search}"`
+    : "";
 
   const rooms = await locals.pb.collection("rooms").getList(page, perPage, {
     sort: "-created",

@@ -46,7 +46,7 @@
     </div>
 
     <Button href="/rooms" class="mt-4 flex items-center gap-2 transition-all hover:scale-105">
-      Discover rooms <BowArrow class="size-4" />
+      Explore rooms <BowArrow class="size-4" />
     </Button>
   </div>
 </div>
