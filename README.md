@@ -1,14 +1,12 @@
 <img src="static/logo.png" alt="ping." width="150">
 
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![License: Zlib](https://img.shields.io/badge/License-Zlib-lightgrey.svg)](https://opensource.org/licenses/Zlib)
 
 **ping.** is a simple reference chat application built on top of
-[PocketBase](https://pocketbase.io). It implements public _real-time rooms_
-(powered by
-[PocketBase's Realtime API](https://pocketbase.io/docs/api-realtime)) and _room
-discovery_ as part of it's feature set. **ping.** doesn't implement any form of
-encryption; all the messages are stored in plain text. **DO NOT** share any
-sensitive information on **ping.** instances.
+[PocketBase](https://pocketbase.io). It implements public _real-time rooms_ and
+_room discovery_ as part of it's feature set. **ping.** doesn't implement any
+form of encryption; all the messages are stored in plain text. **DO NOT** share
+any sensitive information on **ping.** instances.
 
 ### 1. Stack
 
@@ -17,48 +15,55 @@ sensitive information on **ping.** instances.
   [TypeScript](https://www.typescriptlang.org) for UI
 - [Tailwind CSS](https://tailwindcss.com),
   [shadcn-svelte](https://shadcn-svelte.com) for UI design
-- [PocketBase](https://pocketbase.io) for real-time database, authentication,
-  and admin dashboard.
+- [PocketBase](https://pocketbase.io) for database, authentication, and admin
+  dashboard.
+- [Socket.IO](https://socket.io) for bidirectional real-time communication.
 
 ### 2. Build (direnv)
 
 > **NOTE:** The installation steps assume you are using a UNIX-like system. If
 > you are using Windows, use _WSL2_ to build and run this project.
 
-This project and it's dependencies can be scaffold with
-[direnv](https://direnv.net) using:
+This project can be scaffold with [direnv](https://direnv.net) using:
 
 ```sh
 direnv allow
 ```
 
-Once the development shell is ready, we need to prepare the environment
-variables using:
+Once the development shell is ready, prepare the environment variables:
 
 ```sh
 cp .env.example .env
+# PING_HOST (default: 0.0.0.0)
+# PING_PORT (default: 8080)
 # POCKETBASE_HOST (default: 0.0.0.0)
 # POCKETBASE_PORT (default: 8090)
 # POCKETBASE_URL (default: http://$POCKETBASE_HOST:$POCKETBASE_PORT)
-# All three are required. Adjust them as per your requirement.
+# POCKETBASE_SUPERUSER_EMAIL and POCKETBASE_SUPERUSER_PASSWORD must be
+# set beforehand. Use credentials you'll later use to create the superuser
+# account. These variables will be used by the Socket.IO server.
 ```
 
-Once done, direnv should automatically load the environment variables. Now,
-build **ping.** using:
+Direnv should automatically load them. Now, it's time to build **ping.**
 
 ```sh
 pnpm install && pnpm build
 ```
 
-Once built, run **ping.** using:
+Now, create the superuser account:
+
+```sh
+pocketbase superuser create $POCKETBASE_SUPERUSER_EMAIL $POCKETBASE_SUPERUSER_PASSWORD
+```
+
+Finally, run **ping.** using:
 
 ```sh
 pnpm start
 ```
 
-When running for the first time, you'll be asked to create a PocketBase
-_superuser account_. Once done, PocketBase should automatically run the
-migrations and **ping.** should be ready to use!
+PocketBase should automatically run the migrations and **ping.** should be ready
+to use!
 
 ### 3. Build (standard)
 
@@ -70,46 +75,57 @@ curl -fsSL https://get.pnpm.io/install.sh | sh -
 wget -qO- https://get.pnpm.io/install.sh | sh -
 ```
 
-Install _Node.js v24_ using:
+Install _Node.js v24_:
 
 ```sh
 pnpm env use --global 24
 ```
 
-Install PocketBase by following the official documentation at
-[https://pocketbase.io/docs](https://pocketbase.io/docs). Do not forget to add
-the PocketBase binary to your PATH. Now, we need to prepare the environment
-variables using:
+Install PocketBase by following the official guide at
+[https://pocketbase.io/docs](https://pocketbase.io/docs). Make sure to add the
+PocketBase binary to your system `PATH`; otherwise, you'll need to run it using
+the relative path each time.
+
+Next, prepare the environment variables:
 
 ```sh
 cp .env.example .env
+# PING_HOST (default: 0.0.0.0)
+# PING_PORT (default: 8080)
 # POCKETBASE_HOST (default: 0.0.0.0)
 # POCKETBASE_PORT (default: 8090)
 # POCKETBASE_URL (default: http://$POCKETBASE_HOST:$POCKETBASE_PORT)
-# All three are required. Adjust them as per your requirement.
+# POCKETBASE_SUPERUSER_EMAIL and POCKETBASE_SUPERUSER_PASSWORD must be
+# set beforehand. Use credentials you'll later use to create the superuser
+# account. These variables will be used by the Socket.IO server.
 ```
 
-Load the environment variables using:
+Manually load the environment variables:
 
 ```
 source .env
 ```
 
-Once done, build **ping.** using:
+Now, it's time to build **ping.**
 
 ```sh
 pnpm install && pnpm build
 ```
 
-Once built, run **ping.** using:
+Now, create the superuser account:
+
+```sh
+pocketbase superuser create $POCKETBASE_SUPERUSER_EMAIL $POCKETBASE_SUPERUSER_PASSWORD
+```
+
+Finally, run **ping.** using:
 
 ```sh
 pnpm start
 ```
 
-Similarly, when running for the first time, you'll be asked to create a
-PocketBase _superuser account_. Once done, PocketBase should automatically run
-the migrations and **ping.** should be ready to use!
+PocketBase should automatically run the migrations and **ping.** should be ready
+to use!
 
 ### 4. License
 

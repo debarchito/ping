@@ -4,7 +4,7 @@
   "description": "A simple reference chat application built on top of PocketBase",
   "type": "module",
   "scripts": {
-    "start": "pocketbase serve --http=$POCKETBASE_HOST:$POCKETBASE_PORT & node build",
+    "start": "pocketbase serve --http=$POCKETBASE_HOST:$POCKETBASE_PORT & node --experimental-strip-types backend/index.ts",
     "dev": "pocketbase serve --http=$POCKETBASE_HOST:$POCKETBASE_PORT & vite dev",
     "build": "vite build",
     "preview": "pocketbase serve --http=$POCKETBASE_HOST:$POCKETBASE_PORT & vite preview",
@@ -24,6 +24,7 @@
     "@sveltejs/kit": "^2.22.2",
     "@sveltejs/vite-plugin-svelte": "^5.1.0",
     "@tailwindcss/vite": "^4.1.11",
+    "@types/express": "^5.0.3",
     "@types/node": "^24.0.4",
     "@types/validator": "^13.15.2",
     "bits-ui": "^2.8.10",
@@ -50,7 +51,10 @@
   },
   "dependencies": {
     "@fontsource/ms-madi": "^5.2.6",
+    "express": "^5.1.0",
     "pocketbase": "^0.26.1",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
     "validator": "^13.15.15"
   },
   "pnpm": {
