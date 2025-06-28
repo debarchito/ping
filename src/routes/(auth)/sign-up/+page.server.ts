@@ -3,8 +3,10 @@ import type { PageServerLoad, Actions } from "./$types";
 import { redirect, fail } from "@sveltejs/kit";
 import isEmail from "validator/lib/isEmail";
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async ({ locals, url }) => {
   if (locals.user) {
+    const redirectTo = url.searchParams.get("redirectTo");
+    if (redirectTo) return redirect(307, `/${redirectTo.slice(1)}`);
     return redirect(307, "/rooms");
   }
 
@@ -12,7 +14,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-  "sign-up": async ({ locals, request }) => {
+  default: async ({ locals, request, url }) => {
     if (locals.user) {
       return fail(405, { message: "Method Not Allowed" });
     }
@@ -56,6 +58,8 @@ export const actions: Actions = {
       return fail(500, { message: "Oops...something went wrong" });
     }
 
+    const redirectTo = url.searchParams.get("redirectTo");
+    if (redirectTo) return redirect(307, `/${redirectTo.slice(1)}`);
     return redirect(307, "/rooms");
   },
 };

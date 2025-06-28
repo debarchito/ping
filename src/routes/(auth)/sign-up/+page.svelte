@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { page } from "$app/state";
   import { enhance } from "$app/forms";
   import type { ActionData } from "./$types";
   import * as Card from "$lib/components/ui/card/index.js";
@@ -9,6 +10,7 @@
   import { Check, TriangleAlert, Eye, EyeClosed } from "@lucide/svelte";
 
   let { form }: { form: ActionData } = $props();
+  let url = new URL(page.url);
   let password = $state("");
   let showPassword = $state(false);
   let repeatPassword = $state("");
@@ -31,7 +33,7 @@
 
     <Card.Content>
       <div class="grid gap-4">
-        <form class="grid gap-4" method="POST" action="?/sign-up" use:enhance>
+        <form class="grid gap-4" method="POST" use:enhance>
           <div class="grid gap-2">
             <Label for="email">Email</Label>
             <Input
@@ -132,7 +134,7 @@
 
         <div class="mt-4 text-center text-sm">
           Already have an account?
-          <a href="/sign-in" class="underline">Sign in</a>
+          <a href={`/sign-in${url.search}`} class="underline">Sign in</a>
         </div>
       </div>
     </Card.Content>

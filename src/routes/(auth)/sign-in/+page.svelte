@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { page } from "$app/state";
   import { enhance } from "$app/forms";
   import type { ActionData } from "./$types";
   import * as Card from "$lib/components/ui/card/index.js";
@@ -10,6 +11,7 @@
 
   let { form }: { form: ActionData } = $props();
   let showPassword = $state(false);
+  let url = new URL(page.url);
 </script>
 
 <svelte:head>
@@ -81,7 +83,7 @@
 
         <div class="mt-4 text-center text-sm">
           Don't have an account?
-          <a href="/sign-up" class="underline">Sign up</a>
+          <a href={`/sign-up${url.search}`} class="underline">Sign up</a>
         </div>
       </div>
     </Card.Content>
