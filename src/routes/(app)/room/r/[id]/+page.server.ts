@@ -5,8 +5,12 @@ export const load: PageServerLoad = async ({ url, locals }) => {
   console.log(id);
 
   try {
-    await locals.pb.collection("rooms").getOne(id);
-    return { status: 200, message: "Success", payload: {} };
+    const room = await locals.pb.collection("rooms").getOne(id);
+    return {
+      status: 200,
+      message: "Success",
+      payload: { id: room.id, displayName: room.displayName, name: room.name },
+    };
   } catch (err) {
     console.log("[ /room/id] =>", err);
     return { status: 404, message: "Not Found", payload: null };

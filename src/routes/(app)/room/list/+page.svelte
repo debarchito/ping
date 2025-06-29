@@ -213,7 +213,7 @@
         <Card
           class="group cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-md"
         >
-          <a href="/room/~/{room.id}" class="block h-full">
+          <a href="/room/r/{room.id}" class="block h-full">
             <CardHeader class="pb-3">
               <div class="flex items-start justify-between gap-2">
                 <CardTitle
@@ -235,7 +235,7 @@
                 </Badge>
               </div>
               <CardDescription class="text-muted-foreground text-sm">
-                /~/{room.id}
+                r/{room.id}
               </CardDescription>
             </CardHeader>
             <CardContent>

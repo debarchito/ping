@@ -4,6 +4,10 @@
   import { page } from "$app/state";
 </script>
 
+<svelte:head>
+  <title>{page.status} | ping.</title>
+</svelte:head>
+
 <div class="flex min-h-screen items-center justify-center p-4">
   <Card class="w-full max-w-md">
     <CardContent class="pt-6">

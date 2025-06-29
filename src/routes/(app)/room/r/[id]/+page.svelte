@@ -6,6 +6,14 @@
   let { data }: PageProps = $props();
 </script>
 
+<svelte:head>
+  {#if data.status != 200}
+    <title>{data.status} | ping.</title>
+  {:else}
+    <title>{data.payload!.displayName || data.payload!.name} | ping.</title>
+  {/if}
+</svelte:head>
+
 {#if data.status !== 200}
   <div class="flex min-h-screen items-center justify-center p-4">
     <Card class="w-full max-w-md">

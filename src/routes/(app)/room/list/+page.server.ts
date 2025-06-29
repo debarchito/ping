@@ -1,4 +1,4 @@
-import type { PageServerLoad, Actions } from "../../rooms/$types";
+import type { PageServerLoad, Actions } from "./$types";
 
 export const load: PageServerLoad = async ({ locals, url }) => {
   const page = Number(url.searchParams.get("p")) || 1;
