@@ -235,7 +235,7 @@
                 </Badge>
               </div>
               <CardDescription class="text-muted-foreground text-sm">
-                @{room.id}
+                /~/{room.id}
               </CardDescription>
             </CardHeader>
             <CardContent>
