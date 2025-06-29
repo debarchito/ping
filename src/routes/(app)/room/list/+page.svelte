@@ -17,11 +17,11 @@
     Sun,
     Moon,
     Calendar,
-    Hash,
     Plus,
     Search,
     Minus,
     X,
+    MessageCircle,
     LogIn,
     LogOut,
   } from "@lucide/svelte";
@@ -213,13 +213,13 @@
         <Card
           class="group cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-md"
         >
-          <a href="/room/{room.id}" class="block h-full">
+          <a href="/room/~/{room.id}" class="block h-full">
             <CardHeader class="pb-3">
               <div class="flex items-start justify-between gap-2">
                 <CardTitle
                   class="group-hover:text-primary flex min-w-0 flex-1 items-center gap-2 text-lg transition-colors"
                 >
-                  <Hash class="size-4 flex-shrink-0" />
+                  <MessageCircle class="size-4 flex-shrink-0" />
                   <span class="truncate">{room.displayName || room.name}</span>
                 </CardTitle>
                 <Badge variant="secondary" class="flex flex-shrink-0 items-center gap-1 text-xs">
@@ -235,7 +235,7 @@
                 </Badge>
               </div>
               <CardDescription class="text-muted-foreground text-sm">
-                @{room.name}
+                @{room.id}
               </CardDescription>
             </CardHeader>
             <CardContent>
