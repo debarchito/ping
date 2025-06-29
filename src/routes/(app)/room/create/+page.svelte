@@ -97,7 +97,7 @@
 
             <div class="mt-4 text-center text-sm">
               Feeling adventurous?
-              <a href="/rooms" class="underline">Explore rooms</a>
+              <a href="/room/list" class="underline">Explore rooms</a>
             </div>
           </div>
         </Card.Content>

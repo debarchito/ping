@@ -1,4 +1,4 @@
-import type { PageServerLoad, Actions } from "./$types";
+import type { PageServerLoad, Actions } from "../../rooms/$types";
 
 export const load: PageServerLoad = async ({ locals, url }) => {
   const page = Number(url.searchParams.get("p")) || 1;
@@ -15,6 +15,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
   });
 
   return {
+    user: locals.user,
     rooms: rooms.items,
     totalItems: rooms.totalItems,
     totalPages: rooms.totalPages,

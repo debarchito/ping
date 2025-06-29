@@ -7,7 +7,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
   if (locals.user) {
     const redirectTo = url.searchParams.get("redirectTo");
     if (redirectTo) return redirect(307, `/${redirectTo.slice(1)}`);
-    return redirect(307, "/rooms");
+    return redirect(307, "/room/list");
   }
 
   return {};
@@ -60,6 +60,6 @@ export const actions: Actions = {
 
     const redirectTo = url.searchParams.get("redirectTo");
     if (redirectTo) return redirect(307, `/${redirectTo.slice(1)}`);
-    return redirect(307, "/rooms");
+    return redirect(307, "/room/list");
   },
 };

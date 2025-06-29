@@ -11,7 +11,20 @@
     CardTitle,
   } from "$lib/components/ui/card";
   import * as Pagination from "$lib/components/ui/pagination";
-  import { BellDot, Sun, Moon, Calendar, Hash, Plus, Search, Minus, X } from "@lucide/svelte";
+  import * as Tooltip from "$lib/components/ui/tooltip/index.js";
+  import {
+    BellDot,
+    Sun,
+    Moon,
+    Calendar,
+    Hash,
+    Plus,
+    Search,
+    Minus,
+    X,
+    LogIn,
+    LogOut,
+  } from "@lucide/svelte";
   import { toggleMode, mode } from "mode-watcher";
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
@@ -70,33 +83,76 @@
       handleSearch();
     }
   }
+
+  function handleSignOut() {
+    goto("/sign-out");
+  }
+
+  function handleSignIn() {
+    goto("/sign-in");
+  }
 </script>
 
 <svelte:head>
-  <title>Discover rooms | ping.</title>
+  <title>Explore rooms | ping.</title>
 </svelte:head>
 
 <div class="flex flex-col items-center justify-center gap-4 p-4 md:gap-6 md:p-10">
   <div class="flex w-full max-w-4xl flex-col gap-4 md:gap-6">
-    <div
-      class="font-ms-madi flex items-center gap-2 self-center text-4xl font-medium select-none md:text-6xl"
-    >
-      <a class="flex items-center gap-2 self-center" href="/">
+    <div class="flex items-center justify-between text-4xl font-medium select-none md:text-6xl">
+      <a class="flex items-center gap-2" href="/">
         <div
           class="bg-primary text-primary-foreground flex size-6 transform items-center justify-center rounded-full shadow-md transition-transform duration-200 hover:scale-105 md:size-8"
         >
           <BellDot class="size-3 md:size-5" />
         </div>
-        <span class="mr-2 mb-2 md:mr-4 md:mb-4">ping.</span>
+        <span class="font-ms-madi mr-2 mb-2 md:mr-4 md:mb-4">ping.</span>
       </a>
 
-      <Button onclick={toggleMode} variant="outline" size="icon" class="rounded-full">
-        {#if mode.current === "dark"}
-          <Sun class="size-4 md:size-5" />
+      <div class="flex items-center gap-2">
+        <Button onclick={toggleMode} variant="outline" size="icon" class="rounded-full">
+          {#if mode.current === "dark"}
+            <Sun class="size-4 md:size-5" />
+          {:else}
+            <Moon class="size-4 md:size-5" />
+          {/if}
+        </Button>
+
+        {#if data.user}
+          <Tooltip.Provider>
+            <Tooltip.Root>
+              <Tooltip.Trigger>
+                <div
+                  class="bg-primary/10 text-primary flex size-8 items-center justify-center rounded-full text-sm"
+                >
+                  {data.user.name[0].toUpperCase()}
+                </div>
+              </Tooltip.Trigger>
+              <Tooltip.Content>
+                <p>Signed in as {data.user.email}</p>
+              </Tooltip.Content>
+            </Tooltip.Root>
+          </Tooltip.Provider>
+
+          <Button
+            onclick={handleSignOut}
+            variant="outline"
+            size="icon"
+            class="rounded-full shadow-sm transition-shadow hover:shadow-md"
+          >
+            <LogOut class="size-4" />
+          </Button>
         {:else}
-          <Moon class="size-4 md:size-5" />
+          <Button
+            onclick={handleSignIn}
+            variant="outline"
+            size="icon"
+            class="rounded-full shadow-sm transition-shadow hover:shadow-md"
+          >
+            <LogIn class="size-4" />
+          </Button>
         {/if}
-      </Button>
+      </div>
     </div>
 
     <div class="flex flex-col gap-4">
