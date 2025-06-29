@@ -224,14 +224,15 @@
                 </CardTitle>
                 <Badge variant="secondary" class="flex flex-shrink-0 items-center gap-1 text-xs">
                   <Calendar class="size-3" />
-                  <span class="hidden sm:inline">{new Date(room.created).toLocaleDateString()}</span
-                  >
-                  <span class="sm:hidden"
-                    >{new Date(room.created).toLocaleDateString("en", {
+                  <span class="hidden sm:inline">
+                    {new Date(room.created).toLocaleDateString()}
+                  </span>
+                  <span class="sm:hidden">
+                    {new Date(room.created).toLocaleDateString("en", {
                       month: "short",
                       day: "numeric",
-                    })}</span
-                  >
+                    })}
+                  </span>
                 </Badge>
               </div>
               <CardDescription class="text-muted-foreground text-sm">
