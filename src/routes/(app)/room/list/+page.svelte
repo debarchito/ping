@@ -232,46 +232,60 @@
       </div>
     </div>
 
-    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {#each data.rooms as room (room.id)}
-        <Card
-          class="group cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-md"
-        >
-          <a href="/room/r/{room.id}" class="block h-full">
-            <CardHeader class="pb-3">
-              <div class="flex items-start justify-between gap-2">
-                <CardTitle
-                  class="group-hover:text-primary flex min-w-0 flex-1 items-center gap-2 text-lg transition-colors"
-                >
-                  <MessageCircle class="size-4 flex-shrink-0" />
-                  <span class="truncate">{room.displayName || room.name}</span>
-                </CardTitle>
-                <Badge variant="secondary" class="flex flex-shrink-0 items-center gap-1 text-xs">
-                  <Calendar class="size-3" />
-                  <span class="hidden sm:inline">
-                    {new Date(room.created).toLocaleDateString()}
-                  </span>
-                  <span class="sm:hidden">
-                    {new Date(room.created).toLocaleDateString("en", {
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </span>
-                </Badge>
-              </div>
-              <CardDescription class="text-muted-foreground text-sm">
-                r/{room.id}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p class="text-sm leading-relaxed">
-                {room.description}
-              </p>
-            </CardContent>
-          </a>
-        </Card>
-      {/each}
-    </div>
+    {#if !data.rooms.length}
+      <div class="flex flex-col items-center justify-center py-12 text-center">
+        <div class="bg-muted mb-4 rounded-full p-3 sm:p-4">
+          <MessageCircle class="text-muted-foreground size-6 sm:size-8" />
+        </div>
+        <h3 class="text-muted-foreground mb-2 text-base font-medium sm:text-lg">No rooms found</h3>
+        <p class="text-muted-foreground max-w-md text-xs sm:text-sm">
+          {searchQuery
+            ? "No rooms match your search criteria. Try a different search or"
+            : "Create a new room to get started or"} check back later for new rooms.
+        </p>
+      </div>
+    {:else}
+      <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {#each data.rooms as room (room.id)}
+          <Card
+            class="group cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-md"
+          >
+            <a href="/room/r/{room.id}" class="block h-full">
+              <CardHeader class="pb-3">
+                <div class="flex items-start justify-between gap-2">
+                  <CardTitle
+                    class="group-hover:text-primary flex min-w-0 flex-1 items-center gap-2 text-lg transition-colors"
+                  >
+                    <MessageCircle class="size-4 flex-shrink-0" />
+                    <span class="truncate">{room.displayName || room.name}</span>
+                  </CardTitle>
+                  <Badge variant="secondary" class="flex flex-shrink-0 items-center gap-1 text-xs">
+                    <Calendar class="size-3" />
+                    <span class="hidden sm:inline">
+                      {new Date(room.created).toLocaleDateString()}
+                    </span>
+                    <span class="sm:hidden">
+                      {new Date(room.created).toLocaleDateString("en", {
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </span>
+                  </Badge>
+                </div>
+                <CardDescription class="text-muted-foreground text-sm">
+                  r/{room.id}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p class="text-sm leading-relaxed">
+                  {room.description}
+                </p>
+              </CardContent>
+            </a>
+          </Card>
+        {/each}
+      </div>
+    {/if}
 
     {#if data.totalPages > 1}
       <div class="mt-6 flex justify-center">
