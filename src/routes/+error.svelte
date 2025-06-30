@@ -21,7 +21,7 @@
             {page.error!.message}
           </h2>
           <p class="mt-5 space-y-2 text-sm">
-            Continue <a href="/rooms" class="underline">exploring rooms</a>
+            Continue <a href="/room/list" class="underline">exploring rooms</a>
           </p>
         </div>
       </div>

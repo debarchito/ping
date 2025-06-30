@@ -83,14 +83,6 @@
       handleSearch();
     }
   }
-
-  function handleSignOut() {
-    goto("/sign-out");
-  }
-
-  function handleSignIn() {
-    goto("/sign-in");
-  }
 </script>
 
 <svelte:head>
@@ -135,7 +127,7 @@
           </Tooltip.Provider>
 
           <Button
-            onclick={handleSignOut}
+            onclick={() => goto("/sign-out")}
             variant="outline"
             size="icon"
             class="rounded-full shadow-sm transition-shadow hover:shadow-md"
@@ -144,7 +136,7 @@
           </Button>
         {:else}
           <Button
-            onclick={handleSignIn}
+            onclick={() => goto("/sign=in")}
             variant="outline"
             size="icon"
             class="rounded-full shadow-sm transition-shadow hover:shadow-md"

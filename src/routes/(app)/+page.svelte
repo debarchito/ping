@@ -1,7 +1,7 @@
 <script>
-  import { BellDot, BowArrow, Zap, MessageCircle, Sun, Moon } from "@lucide/svelte";
+  import { BellDot, BowArrow, Zap, MessageCircle } from "@lucide/svelte";
   import { Button } from "$lib/components/ui/button";
-  import { toggleMode, mode } from "mode-watcher";
+  import { LightSwitch } from "$lib/components/ui/light-switch";
 </script>
 
 <svelte:head>
@@ -18,16 +18,7 @@
       </div>
       <span class="mr-4 mb-4">ping.</span>
 
-      <Button
-        onclick={toggleMode}
-        class="text-accent-foreground hover:bg-muted size-10 cursor-pointer rounded-full border bg-transparent"
-      >
-        {#if mode.current === "dark"}
-          <Sun class="size-5" />
-        {:else}
-          <Moon class="size-5" />
-        {/if}
-      </Button>
+      <LightSwitch />
     </div>
 
     <div class="mt-4 grid w-full grid-cols-1 gap-4 text-sm">
