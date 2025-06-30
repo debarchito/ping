@@ -446,8 +446,8 @@
                     class={cn(
                       "flex flex-col gap-1 rounded-2xl border px-3 py-2 shadow-sm sm:px-4 sm:py-2.5",
                       isSentByMe
-                        ? "bg-primary/5 dark:bg-primary/8 border-primary/15 text-foreground"
-                        : "bg-secondary/5 dark:bg-secondary/8 border-secondary/15 text-foreground",
+                        ? "dark:bg-primary/10 border-primary/15"
+                        : "bg-secondary dark:bg-secondary/30 border-secondary/15 text-foreground",
                     )}
                   >
                     <p class="text-sm leading-relaxed break-words sm:text-base dark:text-white">
