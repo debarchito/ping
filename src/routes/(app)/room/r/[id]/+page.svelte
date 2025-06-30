@@ -4,7 +4,6 @@
   import { Button } from "$lib/components/ui/button";
   import { Input } from "$lib/components/ui/input";
   import * as Chat from "$lib/components/ui/chat";
-  import Badge from "$lib/components/ui/badge/badge.svelte";
   import * as EmojiPicker from "$lib/components/ui/emoji-picker";
   import * as Popover from "$lib/components/ui/popover";
   import { LightSwitch } from "$lib/components/ui/light-switch";
@@ -20,6 +19,7 @@
     ChevronUpIcon,
     ChevronDownIcon,
     Loader2,
+    UserX,
   } from "@lucide/svelte";
   import { cn } from "$lib/utils";
   import { UseAutoScroll } from "$lib/hooks/use-auto-scroll.svelte";
@@ -283,6 +283,22 @@
     >
       <div class="mx-auto flex max-w-4xl items-center justify-between p-3 sm:p-4">
         <div class="flex items-center gap-2 sm:gap-3">
+          <Tooltip.Provider>
+            <Tooltip.Root>
+              <Tooltip.Trigger>
+                <Button
+                  onclick={() => goto("/room/list")}
+                  variant="outline"
+                  class="h-9 w-9 rounded-md shadow-sm transition-shadow hover:shadow-md"
+                >
+                  <ArrowLeft class="size-4" />
+                </Button>
+              </Tooltip.Trigger>
+              <Tooltip.Content>
+                <p>Explore rooms</p>
+              </Tooltip.Content>
+            </Tooltip.Root>
+          </Tooltip.Provider>
           <div
             class="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-full sm:size-10"
           >
@@ -299,44 +315,28 @@
                 ? `${data.payload?.room.description?.substring(0, 30)}...`
                 : data.payload?.room.description}
             </p>
-            <Badge class="mt-2">
-              <a href="/room/r/{data.payload!.room.id}">
-                r/{data.payload!.room.id}
-              </a>
-            </Badge>
           </div>
         </div>
         <div class="sm: flex items-center gap-2">
-          {#if data.payload?.user}
-            <Tooltip.Provider>
-              <Tooltip.Root>
-                <Tooltip.Trigger>
-                  <div
-                    class="bg-primary/10 text-primary flex h-9 w-9 items-center justify-center rounded-full text-sm"
-                  >
-                    {data.payload?.user.name[0].toUpperCase()}
-                  </div>
-                </Tooltip.Trigger>
-                <Tooltip.Content>
-                  <p>Signed in as {data.payload?.user.email}</p>
-                </Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
-          {/if}
-
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger>
-                <Button
-                  onclick={() => goto("/room/list")}
-                  variant="outline"
-                  class="h-9 w-9 rounded-md shadow-sm transition-shadow hover:shadow-md"
+                <div
+                  class="bg-primary/10 text-primary flex h-9 w-9 items-center justify-center rounded-full text-sm"
                 >
-                  <ArrowLeft class="size-4" />
-                </Button>
+                  {#if data.payload?.user}
+                    {data.payload?.user.name[0].toUpperCase()}
+                  {:else}
+                    <UserX class="size-4" />
+                  {/if}
+                </div>
               </Tooltip.Trigger>
               <Tooltip.Content>
-                <p>Explore rooms</p>
+                {#if data.payload?.user}}
+                  <p>Signed in as {data.payload?.user.email}</p>
+                {:else}
+                  <p>You are currently not signed in</p>
+                {/if}
               </Tooltip.Content>
             </Tooltip.Root>
           </Tooltip.Provider>

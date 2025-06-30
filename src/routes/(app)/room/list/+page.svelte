@@ -20,6 +20,7 @@
     Search,
     Minus,
     X,
+    UserX,
     MessageCircle,
     LogIn,
     LogOut,
@@ -100,22 +101,28 @@
       </a>
 
       <div class="flex items-center gap-2">
-        {#if data.user}
-          <Tooltip.Provider>
-            <Tooltip.Root>
-              <Tooltip.Trigger>
-                <div
-                  class="bg-primary/10 text-primary flex h-9 w-9 items-center justify-center rounded-full text-sm"
-                >
+        <Tooltip.Provider>
+          <Tooltip.Root>
+            <Tooltip.Trigger>
+              <div
+                class="bg-primary/10 text-primary flex h-9 w-9 items-center justify-center rounded-full text-sm"
+              >
+                {#if data.user}
                   {data.user.name[0].toUpperCase()}
-                </div>
-              </Tooltip.Trigger>
-              <Tooltip.Content>
+                {:else}
+                  <UserX class="size-4" />
+                {/if}
+              </div>
+            </Tooltip.Trigger>
+            <Tooltip.Content>
+              {#if data.user}
                 <p>Signed in as {data.user.email}</p>
-              </Tooltip.Content>
-            </Tooltip.Root>
-          </Tooltip.Provider>
-        {/if}
+              {:else}
+                <p>You are currently not signed in</p>
+              {/if}
+            </Tooltip.Content>
+          </Tooltip.Root>
+        </Tooltip.Provider>
 
         <Tooltip.Provider>
           <Tooltip.Root>
@@ -153,13 +160,15 @@
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger>
-                <Button
-                  onclick={() => goto("/sign-in")}
-                  variant="outline"
-                  class="h-9 w-9 rounded-md shadow-sm transition-shadow hover:shadow-md"
-                >
-                  <LogIn class="size-4" />
-                </Button>
+                <div class="flex h-9 items-center">
+                  <Button
+                    onclick={() => goto("/sign-in")}
+                    variant="outline"
+                    class="h-9 w-9 rounded-md shadow-sm transition-shadow hover:shadow-md"
+                  >
+                    <LogIn class="size-4" />
+                  </Button>
+                </div>
               </Tooltip.Trigger>
               <Tooltip.Content>
                 <p>Sign in</p>
