@@ -53,7 +53,7 @@ export const actions: Actions = {
         expand: "userId",
       });
 
-      const a = {
+      return {
         status: 200,
         message: "Success",
         payload: {
@@ -73,8 +73,6 @@ export const actions: Actions = {
           },
         },
       };
-      console.log(JSON.stringify(a, null, 2));
-      return a;
     } catch (err) {
       console.log("[/room/r/[id]] =>", err);
       return { status: 500, message: "Failed to load messages", payload: null };
