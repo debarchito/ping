@@ -12,9 +12,10 @@ any sensitive information on **ping.** instances.
 
 - [Svelte](https://svelte.dev/docs/svelte/overview),
   [SvelteKit](https://svelte.dev/docs/kit/introduction),
-  [TypeScript](https://www.typescriptlang.org) for UI
+  [TypeScript](https://www.typescriptlang.org) for UI.
 - [Tailwind CSS](https://tailwindcss.com),
-  [shadcn-svelte](https://shadcn-svelte.com) for UI design
+  [shadcn-svelte](https://shadcn-svelte.com),
+  [shadcn-svelte-extras](https://www.shadcn-svelte-extras.com) for UI design.
 - [PocketBase](https://pocketbase.io) for database, authentication, and admin
   dashboard.
 - [Socket.IO](https://socket.io) for bidirectional real-time communication.
@@ -40,8 +41,8 @@ cp .env.example .env
 # POCKETBASE_PORT (default: 8090)
 # POCKETBASE_URL (default: http://$POCKETBASE_HOST:$POCKETBASE_PORT)
 # POCKETBASE_SUPERUSER_EMAIL and POCKETBASE_SUPERUSER_PASSWORD must be
-# set beforehand. Use credentials you'll later use to create the superuser
-# account. These variables will be used by the Socket.IO server.
+# set beforehand. Put credentials you'll later use to create the superuser
+# account.
 ```
 
 Direnv should automatically load them. Now, it's time to build **ping.**
@@ -84,7 +85,7 @@ pnpm env use --global 24
 Install PocketBase by following the official guide at
 [https://pocketbase.io/docs](https://pocketbase.io/docs). Make sure to add the
 PocketBase binary to your system `PATH`; otherwise, you'll need to run it using
-the relative path each time.
+the relative path.
 
 Next, prepare the environment variables:
 
@@ -96,8 +97,8 @@ cp .env.example .env
 # POCKETBASE_PORT (default: 8090)
 # POCKETBASE_URL (default: http://$POCKETBASE_HOST:$POCKETBASE_PORT)
 # POCKETBASE_SUPERUSER_EMAIL and POCKETBASE_SUPERUSER_PASSWORD must be
-# set beforehand. Use credentials you'll later use to create the superuser
-# account. These variables will be used by the Socket.IO server.
+# set beforehand. Put credentials you'll later use to create the superuser
+# account.
 ```
 
 Manually load the environment variables:
