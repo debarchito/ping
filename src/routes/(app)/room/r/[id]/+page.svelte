@@ -18,6 +18,7 @@
     LogOut,
     ArrowLeft,
     ChevronUpIcon,
+    ChevronDownIcon,
     Loader2,
   } from "@lucide/svelte";
   import { cn } from "$lib/utils";
@@ -35,8 +36,19 @@
   let scrollContainer: HTMLElement | null = $state(null);
   let scrollHeight = 0;
   let scrollPosition = 0;
+  let isAtBottom = $state(true);
 
   const autoScroll = new UseAutoScroll();
+
+  // Custom smooth scroll to bottom function
+  function smoothScrollToBottom() {
+    if (!scrollContainer) return;
+
+    scrollContainer.scrollTo({
+      top: scrollContainer.scrollHeight,
+      behavior: "smooth",
+    });
+  }
 
   let hasMoreMessages = $derived((data.payload?.messages.totalPages || 0) > currentPage);
 
@@ -58,8 +70,16 @@
   function handleSubmit() {
     if (message.trim() && data.payload?.user) {
       message = "";
-      autoScroll.scrollToBottom();
+      smoothScrollToBottom();
     }
+  }
+
+  function checkIfAtBottom() {
+    if (!scrollContainer) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = scrollContainer;
+    const scrolledToBottom = Math.abs(scrollHeight - scrollTop - clientHeight) < 50;
+    isAtBottom = scrolledToBottom;
   }
 
   type ActionResult = {
@@ -109,7 +129,7 @@
   $effect(() => {
     if (data.status === 200 && data.payload?.messages.items.length) {
       allMessages = data.payload.messages.items;
-      autoScroll.scrollToBottom();
+      smoothScrollToBottom();
     }
   });
 
@@ -237,7 +257,7 @@
     </div>
 
     <div class="flex-1 overflow-hidden">
-      <div class="relative mx-auto h-full w-full max-w-4xl overflow-y-auto">
+      <div class="relative mx-auto h-full w-full max-w-4xl">
         {#if !data.payload!.messages.items.length}
           <div
             class="flex h-full flex-col items-center justify-center px-4 py-8 text-center sm:py-12"
@@ -256,7 +276,8 @@
           <div
             bind:this={scrollContainer}
             bind:this={autoScroll.ref}
-            class="h-full overflow-y-auto px-1 sm:px-2"
+            onscroll={checkIfAtBottom}
+            class="relative h-full overflow-y-auto px-1 sm:px-2"
           >
             <Chat.List class="space-y-2 p-2 sm:space-y-3 sm:p-3 md:space-y-4 md:p-4">
               {#if hasMoreMessages}
@@ -326,6 +347,30 @@
                 </Chat.Bubble>
               {/each}
             </Chat.List>
+          </div>
+        {/if}
+
+        {#if !isAtBottom}
+          <div
+            class="pointer-events-none fixed right-0 bottom-20 left-0 z-10 flex justify-center sm:bottom-24"
+          >
+            <Tooltip.Provider>
+              <Tooltip.Root>
+                <Tooltip.Trigger>
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    class="pointer-events-auto h-10 w-10 rounded-full border shadow-md transition-all duration-200 hover:shadow-lg"
+                    onclick={() => smoothScrollToBottom()}
+                  >
+                    <ChevronDownIcon class="size-5" />
+                  </Button>
+                </Tooltip.Trigger>
+                <Tooltip.Content>
+                  <p>Scroll to bottom</p>
+                </Tooltip.Content>
+              </Tooltip.Root>
+            </Tooltip.Provider>
           </div>
         {/if}
       </div>

@@ -54,6 +54,6 @@ export const actions: Actions = {
       return fail(500, { message: "Oops...something went wrong" });
     }
 
-    return redirect(307, `/room/${roomId}`);
+    return redirect(307, `/room/r/${roomId}`);
   },
 };
