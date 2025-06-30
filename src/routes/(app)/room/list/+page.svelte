@@ -11,11 +11,10 @@
     CardTitle,
   } from "$lib/components/ui/card";
   import * as Pagination from "$lib/components/ui/pagination";
-  import * as Tooltip from "$lib/components/ui/tooltip/index.js";
+  import * as Tooltip from "$lib/components/ui/tooltip";
+  import { LightSwitch } from "$lib/components/ui/light-switch";
   import {
     BellDot,
-    Sun,
-    Moon,
     Calendar,
     Plus,
     Search,
@@ -25,7 +24,6 @@
     LogIn,
     LogOut,
   } from "@lucide/svelte";
-  import { toggleMode, mode } from "mode-watcher";
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
 
@@ -102,20 +100,12 @@
       </a>
 
       <div class="flex items-center gap-2">
-        <Button onclick={toggleMode} variant="outline" size="icon" class="rounded-full">
-          {#if mode.current === "dark"}
-            <Sun class="size-4 md:size-5" />
-          {:else}
-            <Moon class="size-4 md:size-5" />
-          {/if}
-        </Button>
-
         {#if data.user}
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger>
                 <div
-                  class="bg-primary/10 text-primary flex size-8 items-center justify-center rounded-full text-sm"
+                  class="bg-primary/10 text-primary flex h-9 w-9 items-center justify-center rounded-full text-sm"
                 >
                   {data.user.name[0].toUpperCase()}
                 </div>
@@ -125,24 +115,57 @@
               </Tooltip.Content>
             </Tooltip.Root>
           </Tooltip.Provider>
+        {/if}
 
-          <Button
-            onclick={() => goto("/sign-out")}
-            variant="outline"
-            size="icon"
-            class="rounded-full shadow-sm transition-shadow hover:shadow-md"
-          >
-            <LogOut class="size-4" />
-          </Button>
+        <Tooltip.Provider>
+          <Tooltip.Root>
+            <Tooltip.Trigger>
+              <div class="flex h-9 items-center">
+                <LightSwitch />
+              </div>
+            </Tooltip.Trigger>
+            <Tooltip.Content>
+              <p>Switch theme</p>
+            </Tooltip.Content>
+          </Tooltip.Root>
+        </Tooltip.Provider>
+
+        {#if data.user}
+          <Tooltip.Provider>
+            <Tooltip.Root>
+              <Tooltip.Trigger>
+                <div class="flex h-9 items-center">
+                  <Button
+                    onclick={() => goto("/sign-out")}
+                    variant="outline"
+                    class="h-9 w-9 rounded-md shadow-sm transition-shadow hover:shadow-md"
+                  >
+                    <LogOut class="size-4" />
+                  </Button>
+                </div>
+              </Tooltip.Trigger>
+              <Tooltip.Content>
+                <p>Sign out</p>
+              </Tooltip.Content>
+            </Tooltip.Root>
+          </Tooltip.Provider>
         {:else}
-          <Button
-            onclick={() => goto("/sign=in")}
-            variant="outline"
-            size="icon"
-            class="rounded-full shadow-sm transition-shadow hover:shadow-md"
-          >
-            <LogIn class="size-4" />
-          </Button>
+          <Tooltip.Provider>
+            <Tooltip.Root>
+              <Tooltip.Trigger>
+                <Button
+                  onclick={() => goto("/sign-in")}
+                  variant="outline"
+                  class="h-9 w-9 rounded-md shadow-sm transition-shadow hover:shadow-md"
+                >
+                  <LogIn class="size-4" />
+                </Button>
+              </Tooltip.Trigger>
+              <Tooltip.Content>
+                <p>Sign in</p>
+              </Tooltip.Content>
+            </Tooltip.Root>
+          </Tooltip.Provider>
         {/if}
       </div>
     </div>

@@ -7,6 +7,4 @@ export default function injectSocketIO(server: HttpServer) {
   io.on("connection", () => {
     //
   });
-
-  console.log("SocketIO injected");
 }

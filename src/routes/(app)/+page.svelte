@@ -2,6 +2,7 @@
   import { BellDot, BowArrow, Zap, MessageCircle } from "@lucide/svelte";
   import { Button } from "$lib/components/ui/button";
   import { LightSwitch } from "$lib/components/ui/light-switch";
+  import * as Tooltip from "$lib/components/ui/tooltip";
 </script>
 
 <svelte:head>
@@ -18,7 +19,18 @@
       </div>
       <span class="mr-4 mb-4">ping.</span>
 
-      <LightSwitch />
+      <Tooltip.Provider>
+        <Tooltip.Root>
+          <Tooltip.Trigger>
+            <div class="flex h-9 items-center">
+              <LightSwitch />
+            </div>
+          </Tooltip.Trigger>
+          <Tooltip.Content>
+            <p>Switch theme</p>
+          </Tooltip.Content>
+        </Tooltip.Root>
+      </Tooltip.Provider>
     </div>
 
     <div class="mt-4 grid w-full grid-cols-1 gap-4 text-sm">

@@ -3,19 +3,20 @@
   import { Card, CardContent } from "$lib/components/ui/card";
   import { Button } from "$lib/components/ui/button";
   import { Input } from "$lib/components/ui/input";
-  import { Badge } from "$lib/components/ui/badge";
   import * as Chat from "$lib/components/ui/chat";
+  import Badge from "$lib/components/ui/badge/badge.svelte";
   import * as EmojiPicker from "$lib/components/ui/emoji-picker";
   import * as Popover from "$lib/components/ui/popover";
   import { LightSwitch } from "$lib/components/ui/light-switch";
+  import * as Tooltip from "$lib/components/ui/tooltip";
   import {
     AlertCircle,
     MessageCircle,
-    Users,
     SmilePlusIcon,
     SendHorizontal,
     LogIn,
     LogOut,
+    ArrowLeft,
   } from "@lucide/svelte";
   import { cn } from "$lib/utils";
   import { UseAutoScroll } from "$lib/hooks/use-auto-scroll.svelte";
@@ -82,28 +83,81 @@
             >
               {data.payload!.room.displayName || data.payload!.room.name}
             </h1>
-            <a
-              href="/room/r/{data.payload!.room.id}"
-              class="text-muted-foreground text-xs sm:text-sm"
-            >
-              r/{data.payload!.room.id}
-            </a>
+            <p class="text-muted-foreground text-xs">
+              {data.payload?.room.description?.length > 30
+                ? `${data.payload?.room.description?.substring(0, 30)}...`
+                : data.payload?.room.description}
+            </p>
+            <Badge class="mt-2">
+              <a href="/room/r/{data.payload!.room.id}">
+                r/{data.payload!.room.id}
+              </a>
+            </Badge>
           </div>
         </div>
         <div class="flex items-center gap-1 sm:gap-2">
-          <Badge variant="secondary" class="flex items-center gap-1 text-xs">
-            <Users class="size-3" />
-            <span class="xs:inline hidden">0 online</span>
-          </Badge>
-          <LightSwitch />
           {#if data.payload?.user}
-            <Button
-              onclick={() => goto("/sign-out")}
-              variant="outline"
-              class="h-9 w-9 rounded-md shadow-sm transition-shadow hover:shadow-md"
-            >
-              <LogOut class="size-4" />
-            </Button>
+            <Tooltip.Provider>
+              <Tooltip.Root>
+                <Tooltip.Trigger>
+                  <div
+                    class="bg-primary/10 text-primary flex h-9 w-9 items-center justify-center rounded-full text-sm"
+                  >
+                    {data.payload?.user.name[0].toUpperCase()}
+                  </div>
+                </Tooltip.Trigger>
+                <Tooltip.Content>
+                  <p>Signed in as {data.payload?.user.email}</p>
+                </Tooltip.Content>
+              </Tooltip.Root>
+            </Tooltip.Provider>
+          {/if}
+
+          <Tooltip.Provider>
+            <Tooltip.Root>
+              <Tooltip.Trigger>
+                <Button
+                  onclick={() => goto("/room/list")}
+                  variant="outline"
+                  class="h-9 w-9 rounded-md shadow-sm transition-shadow hover:shadow-md"
+                >
+                  <ArrowLeft class="size-4" />
+                </Button>
+              </Tooltip.Trigger>
+              <Tooltip.Content>
+                <p>Explore rooms</p>
+              </Tooltip.Content>
+            </Tooltip.Root>
+          </Tooltip.Provider>
+
+          <Tooltip.Provider>
+            <Tooltip.Root>
+              <Tooltip.Trigger>
+                <LightSwitch />
+              </Tooltip.Trigger>
+              <Tooltip.Content>
+                <p>Switch theme</p>
+              </Tooltip.Content>
+            </Tooltip.Root>
+          </Tooltip.Provider>
+
+          {#if data.payload?.user}
+            <Tooltip.Provider>
+              <Tooltip.Root>
+                <Tooltip.Trigger>
+                  <Button
+                    onclick={() => goto("/sign-out")}
+                    variant="outline"
+                    class="h-9 w-9 rounded-md shadow-sm transition-shadow hover:shadow-md"
+                  >
+                    <LogOut class="size-4" />
+                  </Button>
+                </Tooltip.Trigger>
+                <Tooltip.Content>
+                  <p>Sign out</p>
+                </Tooltip.Content>
+              </Tooltip.Root>
+            </Tooltip.Provider>
           {/if}
         </div>
       </div>
@@ -126,8 +180,8 @@
             </p>
           </div>
         {:else}
-          <div bind:this={autoScroll.ref} class="h-full overflow-y-auto">
-            <Chat.List class="space-y-3 p-3 sm:space-y-4 sm:p-4">
+          <div bind:this={autoScroll.ref} class="h-full overflow-y-auto px-1 sm:px-2">
+            <Chat.List class="space-y-2 p-2 sm:space-y-3 sm:p-3 md:space-y-4 md:p-4">
               {#each [...data.payload!.messages.items].reverse() as msg (msg.id)}
                 {@const isSentByMe = "userId" in msg && msg.userId === data.payload!.user?.id}
                 <Chat.Bubble
@@ -137,10 +191,10 @@
                   <Chat.BubbleAvatar>
                     <Chat.BubbleAvatarFallback
                       class={cn(
-                        "ring-background/50 ring-2",
+                        "ring-background/50 ring-1",
                         isSentByMe
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-secondary text-secondary-foreground",
+                          ? "bg-primary/90 text-primary-foreground"
+                          : "bg-secondary/90 text-secondary-foreground",
                       )}
                     >
                       {getInitials("name" in msg.user ? msg.user.name : "")}
@@ -148,21 +202,19 @@
                   </Chat.BubbleAvatar>
                   <Chat.BubbleMessage
                     class={cn(
-                      "flex flex-col gap-1 rounded-2xl border px-3 py-2 shadow-sm sm:px-4 sm:py-3",
+                      "flex flex-col gap-1 rounded-2xl border px-3 py-2 shadow-sm sm:px-4 sm:py-2.5",
                       isSentByMe
-                        ? "bg-primary/10 border-primary/20"
-                        : "bg-secondary/10 border-secondary/20",
+                        ? "bg-primary/5 dark:bg-primary/8 border-primary/15 text-foreground"
+                        : "bg-secondary/5 dark:bg-secondary/8 border-secondary/15 text-foreground",
                     )}
                   >
-                    <p class="text-sm leading-relaxed break-words sm:text-base">
+                    <p class="text-sm leading-relaxed break-words sm:text-base dark:text-white">
                       {msg.content ?? ""}
                     </p>
                     <div
                       class={cn(
-                        "w-full text-xs font-bold italic opacity-70",
-                        isSentByMe
-                          ? "text-end text-gray-300 dark:text-gray-900"
-                          : "text-muted-foreground text-start",
+                        "w-full text-xs italic opacity-60",
+                        isSentByMe ? "text-end text-gray-200" : "text-foreground/70 text-start",
                       )}
                     >
                       {formatTime(msg.created ? new Date(msg.created) : null)}
@@ -191,7 +243,7 @@
             <div class="relative flex w-full items-center">
               <Input
                 bind:value={message}
-                class="h-10 rounded-full pr-16 pl-10 text-sm sm:h-12 sm:pr-24 sm:pl-12 sm:text-base"
+                class="h-10 rounded-full pr-16 pl-10 text-sm sm:h-11 sm:pr-24 sm:pl-12 sm:text-base md:h-12"
                 placeholder="Type your message..."
               />
 

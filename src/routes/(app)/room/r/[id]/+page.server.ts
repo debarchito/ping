@@ -5,7 +5,7 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 
   try {
     const room = await locals.pb.collection("rooms").getOne(id);
-    const messages = await locals.pb.collection("messages").getList(1, 10, {
+    const messages = await locals.pb.collection("messages").getList(1, 2, {
       filter: `roomId = "${id}"`,
       sort: "-created",
       expand: "userId",
