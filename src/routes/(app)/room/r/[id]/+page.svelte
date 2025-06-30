@@ -25,6 +25,9 @@
   import { UseAutoScroll } from "$lib/hooks/use-auto-scroll.svelte";
   import { goto } from "$app/navigation";
   import { enhance } from "$app/forms";
+  import { io, type Socket } from "socket.io-client";
+  import { toast } from "svelte-sonner";
+  import { Toaster } from "$lib/components/ui/sonner/index.js";
 
   let { data }: PageProps = $props();
   let message = $state("");
@@ -37,10 +40,110 @@
   let scrollHeight = 0;
   let scrollPosition = 0;
   let isAtBottom = $state(true);
+  let socket = $state<Socket | null>(null);
+  let connected = $state(false);
+
+  let lastUserJoinedInfo = $state<{ roomId: string; username: string; timestamp: number } | null>(
+    null,
+  );
+  let lastUserLeftInfo = $state<{ roomId: string; username: string; timestamp: number } | null>(
+    null,
+  );
 
   const autoScroll = new UseAutoScroll();
 
-  // Custom smooth scroll to bottom function
+  if (data.status === 200 && data.payload?.room?.id) {
+    socket = io("/");
+
+    socket.on("connect", () => {
+      connected = true;
+      const roomId = data.payload!.room.id;
+      const isAuthenticated = !!data.payload?.user;
+
+      socket?.emit("join_room", {
+        roomId,
+        username: data.payload?.user?.name || "Anonymous",
+        userId: data.payload?.user?.id,
+        isAuthenticated,
+      });
+    });
+
+    socket.on("new_message", (newMsg: MessageItem) => {
+      if (newMsg.roomId === data.payload!.room.id) {
+        allMessages = [...allMessages, newMsg];
+        if (isAtBottom) {
+          setTimeout(smoothScrollToBottom, 100);
+        }
+      }
+    });
+
+    socket.on("user_joined", (joinInfo: { roomId: string; username: string }) => {
+      if (joinInfo.roomId === data.payload!.room.id) {
+        const now = Date.now();
+        const isDuplicate =
+          lastUserJoinedInfo &&
+          lastUserJoinedInfo.roomId === joinInfo.roomId &&
+          lastUserJoinedInfo.username === joinInfo.username &&
+          now - lastUserJoinedInfo.timestamp < 2000;
+
+        if (!isDuplicate) {
+          lastUserJoinedInfo = { ...joinInfo, timestamp: now };
+
+          toast.success(`${joinInfo.username} joined the room`, {
+            description: formatTime(new Date()),
+          });
+
+          if (isAtBottom) {
+            setTimeout(smoothScrollToBottom, 100);
+          }
+        }
+      }
+    });
+
+    socket.on("user_left", (leaveInfo: { roomId: string; username: string }) => {
+      if (leaveInfo.roomId === data.payload!.room.id) {
+        const now = Date.now();
+        const isDuplicate =
+          lastUserLeftInfo &&
+          lastUserLeftInfo.roomId === leaveInfo.roomId &&
+          lastUserLeftInfo.username === leaveInfo.username &&
+          now - lastUserLeftInfo.timestamp < 2000;
+
+        if (!isDuplicate) {
+          lastUserLeftInfo = { ...leaveInfo, timestamp: now };
+
+          toast.success(`${leaveInfo.username} left the room`, {
+            description: formatTime(new Date()),
+          });
+
+          if (isAtBottom) {
+            setTimeout(smoothScrollToBottom, 100);
+          }
+        }
+      }
+    });
+
+    socket.on("disconnect", () => {
+      connected = false;
+    });
+  }
+
+  $effect(() => {
+    return () => {
+      if (socket) {
+        if (data.payload?.user) {
+          socket.emit("leave_room", {
+            roomId: data.payload.room.id,
+            username: data.payload.user.name,
+            userId: data.payload.user.id,
+            isAuthenticated: true,
+          });
+        }
+        socket.disconnect();
+      }
+    };
+  });
+
   function smoothScrollToBottom() {
     if (!scrollContainer) return;
 
@@ -68,7 +171,20 @@
   }
 
   function handleSubmit() {
-    if (message.trim() && data.payload?.user) {
+    if (message.trim() && data.payload?.user && socket && connected) {
+      const newMessage = {
+        content: message.trim(),
+        user: {
+          name: data.payload.user.name,
+          id: data.payload.user.id,
+        },
+        roomId: data.payload.room.id,
+        userId: data.payload.user.id,
+        created: new Date().toISOString(),
+      };
+
+      socket.emit("send_message", newMessage);
+
       message = "";
       smoothScrollToBottom();
     }
@@ -147,6 +263,7 @@
     collectionId: string;
     collectionName: string;
     expand?: Record<string, unknown>;
+    roomId?: string;
   };
 </script>
 
@@ -159,6 +276,7 @@
 </svelte:head>
 
 {#if data.status == 200}
+  <Toaster />
   <div class="flex h-screen flex-col overflow-hidden">
     <div
       class="bg-background/95 supports-[backdrop-filter]:bg-background/60 z-10 border-b backdrop-blur"
@@ -258,7 +376,7 @@
 
     <div class="flex-1 overflow-hidden">
       <div class="relative mx-auto h-full w-full max-w-4xl">
-        {#if !data.payload!.messages.items.length}
+        {#if !allMessages.length}
           <div
             class="flex h-full flex-col items-center justify-center px-4 py-8 text-center sm:py-12"
           >
@@ -282,7 +400,7 @@
             <Chat.List class="space-y-2 p-2 sm:space-y-3 sm:p-3 md:space-y-4 md:p-4">
               {#if hasMoreMessages}
                 <div class="flex justify-center pb-4">
-                  <form method="POST" use:enhance={handleLoadMoreMessages}>
+                  <form method="POST" action="?/load-more" use:enhance={handleLoadMoreMessages}>
                     <input type="hidden" name="roomId" value={data.payload!.room.id} />
                     <input type="hidden" name="page" value={currentPage + 1} />
                     <input type="hidden" name="perPage" value={perPage} />
@@ -438,7 +556,7 @@
                   variant="ghost"
                   size="sm"
                   class="text-primary hover:bg-primary/10 flex h-7 items-center justify-center sm:h-8"
-                  disabled={!message.trim()}
+                  disabled={!message.trim() || !connected}
                 >
                   <SendHorizontal class="size-4 sm:size-5" />
                 </Button>

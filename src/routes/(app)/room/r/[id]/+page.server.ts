@@ -40,7 +40,7 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 };
 
 export const actions: Actions = {
-  default: async ({ request, locals }) => {
+  "load-more": async ({ request, locals }) => {
     const formData = await request.formData();
     const id = formData.get("roomId") as string;
     const page = parseInt(formData.get("page") as string) || 1;
