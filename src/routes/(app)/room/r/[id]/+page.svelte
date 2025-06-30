@@ -42,13 +42,10 @@
   let isAtBottom = $state(true);
   let socket = $state<Socket | null>(null);
   let connected = $state(false);
+  let sendingMessage = $state(false);
 
-  let lastUserJoinedInfo = $state<{ roomId: string; username: string; timestamp: number } | null>(
-    null,
-  );
-  let lastUserLeftInfo = $state<{ roomId: string; username: string; timestamp: number } | null>(
-    null,
-  );
+  // Track processed events to prevent duplicates
+  let processedEvents = $state(new Map<string, number>());
 
   const autoScroll = new UseAutoScroll();
 
@@ -60,7 +57,8 @@
       const roomId = data.payload!.room.id;
       const isAuthenticated = !!data.payload?.user;
 
-      socket?.emit("join_room", {
+      // Join the room
+      socket.emit("join_room", {
         roomId,
         username: data.payload?.user?.name || "Anonymous",
         userId: data.payload?.user?.id,
@@ -78,47 +76,59 @@
     });
 
     socket.on("user_joined", (joinInfo: { roomId: string; username: string }) => {
-      if (joinInfo.roomId === data.payload!.room.id) {
+      if (
+        joinInfo.roomId === data.payload!.room.id &&
+        joinInfo.username !== data.payload?.user?.name
+      ) {
+        // Create a unique key for this event
+        const eventKey = `join:${joinInfo.roomId}:${joinInfo.username}`;
         const now = Date.now();
-        const isDuplicate =
-          lastUserJoinedInfo &&
-          lastUserJoinedInfo.roomId === joinInfo.roomId &&
-          lastUserJoinedInfo.username === joinInfo.username &&
-          now - lastUserJoinedInfo.timestamp < 2000;
 
-        if (!isDuplicate) {
-          lastUserJoinedInfo = { ...joinInfo, timestamp: now };
+        // Check if we've processed this event recently (within 5 seconds)
+        const lastProcessed = processedEvents.get(eventKey);
+        if (lastProcessed && now - lastProcessed < 5000) {
+          return; // Skip duplicate event
+        }
 
-          toast.success(`${joinInfo.username} joined the room`, {
-            description: formatTime(new Date()),
-          });
+        // Store this event as processed
+        processedEvents.set(eventKey, now);
 
-          if (isAtBottom) {
-            setTimeout(smoothScrollToBottom, 100);
-          }
+        // Notify user
+        toast.success(`${joinInfo.username} joined the room`, {
+          description: formatTime(new Date()),
+        });
+
+        if (isAtBottom) {
+          setTimeout(smoothScrollToBottom, 100);
         }
       }
     });
 
     socket.on("user_left", (leaveInfo: { roomId: string; username: string }) => {
-      if (leaveInfo.roomId === data.payload!.room.id) {
+      if (
+        leaveInfo.roomId === data.payload!.room.id &&
+        leaveInfo.username !== data.payload?.user?.name
+      ) {
+        // Create a unique key for this event
+        const eventKey = `leave:${leaveInfo.roomId}:${leaveInfo.username}`;
         const now = Date.now();
-        const isDuplicate =
-          lastUserLeftInfo &&
-          lastUserLeftInfo.roomId === leaveInfo.roomId &&
-          lastUserLeftInfo.username === leaveInfo.username &&
-          now - lastUserLeftInfo.timestamp < 2000;
 
-        if (!isDuplicate) {
-          lastUserLeftInfo = { ...leaveInfo, timestamp: now };
+        // Check if we've processed this event recently (within 5 seconds)
+        const lastProcessed = processedEvents.get(eventKey);
+        if (lastProcessed && now - lastProcessed < 5000) {
+          return; // Skip duplicate event
+        }
 
-          toast.success(`${leaveInfo.username} left the room`, {
-            description: formatTime(new Date()),
-          });
+        // Store this event as processed
+        processedEvents.set(eventKey, now);
 
-          if (isAtBottom) {
-            setTimeout(smoothScrollToBottom, 100);
-          }
+        // Notify user
+        toast.success(`${leaveInfo.username} left the room`, {
+          description: formatTime(new Date()),
+        });
+
+        if (isAtBottom) {
+          setTimeout(smoothScrollToBottom, 100);
         }
       }
     });
@@ -132,14 +142,12 @@
     return () => {
       if (socket) {
         if (data.payload?.user) {
-          socket.emit("leave_room", {
-            roomId: data.payload.room.id,
-            username: data.payload.user.name,
-            userId: data.payload.user.id,
-            isAuthenticated: true,
-          });
+          // Just disconnect without emitting leave_room - the server should handle this
+          // This helps prevent duplicate leave notifications
+          socket.disconnect();
+        } else {
+          socket.disconnect();
         }
-        socket.disconnect();
       }
     };
   });
@@ -170,24 +178,40 @@
     })}`;
   }
 
-  function handleSubmit() {
-    if (message.trim() && data.payload?.user && socket && connected) {
-      const newMessage = {
-        content: message.trim(),
-        user: {
-          name: data.payload.user.name,
-          id: data.payload.user.id,
-        },
-        roomId: data.payload.room.id,
-        userId: data.payload.user.id,
-        created: new Date().toISOString(),
-      };
+  function handleMessageSubmit() {
+    if (!message.trim() || !data.payload?.user) return;
 
-      socket.emit("send_message", newMessage);
+    sendingMessage = true;
 
-      message = "";
-      smoothScrollToBottom();
-    }
+    return async ({ result }: { result: any }) => {
+      sendingMessage = false;
+
+      if (result.type === "success" && result.data?.status === 200) {
+        // Only emit the message if the server action was successful
+        if (socket && connected) {
+          const newMessage = {
+            content: message.trim(),
+            user: {
+              name: data.payload!.user.name,
+              id: data.payload!.user.id,
+            },
+            roomId: data.payload!.room.id,
+            userId: data.payload!.user.id,
+            created: new Date().toISOString(),
+          };
+          socket.emit("send_message", newMessage);
+        }
+
+        // Clear the message input and scroll to bottom
+        message = "";
+        smoothScrollToBottom();
+      } else {
+        // Show error toast when message sending fails
+        toast.error("Failed to send message", {
+          description: result.data?.message || "Please try again later",
+        });
+      }
+    };
   }
 
   function checkIfAtBottom() {
@@ -446,8 +470,8 @@
                     class={cn(
                       "flex flex-col gap-1 rounded-2xl border px-3 py-2 shadow-sm sm:px-4 sm:py-2.5",
                       isSentByMe
-                        ? "dark:bg-primary/10 border-primary/15"
-                        : "bg-secondary dark:bg-secondary/30 border-secondary/15 text-foreground",
+                        ? "dark:bg-primary/5 border-primary/15"
+                        : "bg-secondary dark:bg-secondary/60 border-secondary/15 text-foreground",
                     )}
                   >
                     <p class="text-sm leading-relaxed break-words sm:text-base dark:text-white">
@@ -500,12 +524,15 @@
       <div class="mx-auto max-w-4xl">
         {#if data.payload!.user}
           <form
-            onsubmit={(e) => {
-              e.preventDefault();
-              handleSubmit();
-            }}
+            method="POST"
+            action="?/message"
+            use:enhance={handleMessageSubmit}
             class="flex place-items-center"
           >
+            <input type="hidden" name="userId" value={data.payload!.user.id} />
+            <input type="hidden" name="roomId" value={data.payload!.room.id} />
+            <input type="hidden" name="content" value={message.trim()} />
+
             <div class="relative flex w-full items-center">
               <Input
                 bind:value={message}
@@ -556,9 +583,13 @@
                   variant="ghost"
                   size="sm"
                   class="text-primary hover:bg-primary/10 flex h-7 items-center justify-center sm:h-8"
-                  disabled={!message.trim() || !connected}
+                  disabled={!message.trim() || !connected || sendingMessage}
                 >
-                  <SendHorizontal class="size-4 sm:size-5" />
+                  {#if sendingMessage}
+                    <Loader2 class="size-4 animate-spin" />
+                  {:else}
+                    <SendHorizontal class="size-4 sm:size-5" />
+                  {/if}
                 </Button>
               </div>
             </div>

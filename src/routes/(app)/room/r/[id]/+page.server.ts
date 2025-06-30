@@ -80,4 +80,35 @@ export const actions: Actions = {
       return { status: 500, message: "Failed to load messages", payload: null };
     }
   },
+  message: async ({ request, locals }) => {
+    const formData = await request.formData();
+    const userId = formData.get("userId") as string;
+    const roomId = formData.get("roomId") as string;
+    const content = formData.get("content") as string;
+
+    if (!userId || !roomId || !content) {
+      return {
+        status: 400,
+        message: "Missing required fields",
+        payload: null,
+      };
+    }
+
+    try {
+      const message = await locals.pb.collection("messages").create({
+        userId,
+        roomId,
+        content,
+      });
+
+      return {
+        status: 200,
+        message: "Message sent successfully",
+        payload: { message },
+      };
+    } catch (err) {
+      console.log("[/room/r/[id]] message action =>", err);
+      return { status: 500, message: "Failed to send message", payload: null };
+    }
+  },
 };
