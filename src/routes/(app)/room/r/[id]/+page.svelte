@@ -356,7 +356,7 @@
                 </div>
               </Tooltip.Trigger>
               <Tooltip.Content>
-                {#if data.payload?.user}}
+                {#if data.payload?.user}
                   <p>Signed in as {data.payload?.user.email}</p>
                 {:else}
                   <p>You are currently not signed in</p>
@@ -450,6 +450,7 @@
 
               {#each allMessages as msg, index (msg.id + "-" + index)}
                 {@const isSentByMe = "userId" in msg && msg.userId === data.payload!.user?.id}
+                {@const username = "name" in msg.user ? msg.user.name : "Unknown"}
                 <Chat.Bubble
                   variant={isSentByMe ? "sent" : "received"}
                   class="shadow-sm transition-all duration-200 hover:translate-y-[-1px] hover:shadow-md"
@@ -463,7 +464,7 @@
                           : "bg-secondary/90 text-secondary-foreground",
                       )}
                     >
-                      {getInitials("name" in msg.user ? msg.user.name : "")}
+                      {getInitials(username)}
                     </Chat.BubbleAvatarFallback>
                   </Chat.BubbleAvatar>
                   <Chat.BubbleMessage
@@ -483,6 +484,7 @@
                         isSentByMe ? "text-end text-gray-200" : "text-foreground/70 text-start",
                       )}
                     >
+                      <span class="font-bold">{username}</span>,
                       {formatTime(msg.created ? new Date(msg.created) : null)}
                     </div>
                   </Chat.BubbleMessage>
