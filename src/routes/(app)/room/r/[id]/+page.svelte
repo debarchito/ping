@@ -17,16 +17,28 @@
     LogIn,
     LogOut,
     ArrowLeft,
+    ChevronUpIcon,
+    Loader2,
   } from "@lucide/svelte";
   import { cn } from "$lib/utils";
   import { UseAutoScroll } from "$lib/hooks/use-auto-scroll.svelte";
   import { goto } from "$app/navigation";
+  import { enhance } from "$app/forms";
 
   let { data }: PageProps = $props();
   let message = $state("");
   let emojiPickerOpen = $state(false);
+  let loadingMoreMessages = $state(false);
+  let allMessages = $state(data.payload?.messages.items || []);
+  let currentPage = $state(data.payload?.messages.page || 1);
+  let perPage = $state(data.payload?.messages.perPage || 10);
+  let scrollContainer: HTMLElement | null = $state(null);
+  let scrollHeight = 0;
+  let scrollPosition = 0;
 
   const autoScroll = new UseAutoScroll();
+
+  let hasMoreMessages = $derived((data.payload?.messages.totalPages || 0) > currentPage);
 
   function getInitials(name: string): string {
     return name ? name.substring(0, 1).toUpperCase() : "U";
@@ -50,11 +62,72 @@
     }
   }
 
+  type ActionResult = {
+    type: string;
+    data?: {
+      status: number;
+      message: string;
+      payload: {
+        messages: {
+          totalItems: number;
+          page: number;
+          totalPages: number;
+          perPage: number;
+          items: MessageItem[];
+        };
+      };
+    };
+  };
+
+  function handleLoadMoreMessages() {
+    if (!data.payload?.room?.id || loadingMoreMessages || !hasMoreMessages) return;
+
+    loadingMoreMessages = true;
+
+    if (scrollContainer) {
+      scrollHeight = scrollContainer.scrollHeight;
+      scrollPosition = scrollContainer.scrollTop;
+    }
+
+    return async ({ result }: { result: ActionResult }) => {
+      if (result.type === "success" && result.data?.status === 200) {
+        const newMessages = result.data.payload.messages.items;
+        allMessages = [...newMessages, ...allMessages];
+        currentPage = result.data.payload.messages.page;
+        setTimeout(() => {
+          if (scrollContainer) {
+            const newScrollHeight = scrollContainer.scrollHeight;
+            const heightDifference = newScrollHeight - scrollHeight;
+            scrollContainer.scrollTop = scrollPosition + heightDifference;
+          }
+        }, 0);
+      }
+      loadingMoreMessages = false;
+    };
+  }
+
   $effect(() => {
     if (data.status === 200 && data.payload?.messages.items.length) {
+      allMessages = data.payload.messages.items;
       autoScroll.scrollToBottom();
     }
   });
+
+  type MessageUser = {
+    name: string;
+    id?: string;
+  };
+
+  type MessageItem = {
+    id: string;
+    content: string;
+    created: string;
+    userId?: string;
+    user: MessageUser;
+    collectionId: string;
+    collectionName: string;
+    expand?: Record<string, unknown>;
+  };
 </script>
 
 <svelte:head>
@@ -95,7 +168,7 @@
             </Badge>
           </div>
         </div>
-        <div class="flex items-center gap-1 sm:gap-2">
+        <div class="sm: flex items-center gap-2">
           {#if data.payload?.user}
             <Tooltip.Provider>
               <Tooltip.Root>
@@ -180,9 +253,39 @@
             </p>
           </div>
         {:else}
-          <div bind:this={autoScroll.ref} class="h-full overflow-y-auto px-1 sm:px-2">
+          <div
+            bind:this={scrollContainer}
+            bind:this={autoScroll.ref}
+            class="h-full overflow-y-auto px-1 sm:px-2"
+          >
             <Chat.List class="space-y-2 p-2 sm:space-y-3 sm:p-3 md:space-y-4 md:p-4">
-              {#each [...data.payload!.messages.items].reverse() as msg (msg.id)}
+              {#if hasMoreMessages}
+                <div class="flex justify-center pb-4">
+                  <form method="POST" use:enhance={handleLoadMoreMessages}>
+                    <input type="hidden" name="roomId" value={data.payload!.room.id} />
+                    <input type="hidden" name="page" value={currentPage + 1} />
+                    <input type="hidden" name="perPage" value={perPage} />
+
+                    <Button
+                      type="submit"
+                      variant="outline"
+                      size="sm"
+                      class="flex items-center gap-2 rounded-full"
+                      disabled={loadingMoreMessages}
+                    >
+                      {#if loadingMoreMessages}
+                        <Loader2 class="size-4 animate-spin" />
+                        <span>Loading...</span>
+                      {:else}
+                        <ChevronUpIcon class="size-4" />
+                        <span>Load more</span>
+                      {/if}
+                    </Button>
+                  </form>
+                </div>
+              {/if}
+
+              {#each allMessages as msg, index (msg.id + "-" + index)}
                 {@const isSentByMe = "userId" in msg && msg.userId === data.payload!.user?.id}
                 <Chat.Bubble
                   variant={isSentByMe ? "sent" : "received"}
