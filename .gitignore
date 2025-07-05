@@ -7,8 +7,8 @@ node_modules
 .vercel
 .netlify
 .wrangler
-/.svelte-kit
-/build
+.svelte-kit
+build
 
 # OS
 .DS_Store
@@ -27,3 +27,6 @@ vite.config.ts.timestamp-*
 # Pocketbase
 pb_data/*
 !pb_data/types.d.ts
+
+# mkcert Certificates
+cert
