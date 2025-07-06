@@ -18,4 +18,4 @@ const host = process.env.PING_HOST || "0.0.0.0";
 
 injectSocketIO(server);
 app.use(handler);
-server.listen(port, host, () => console.log(`[?] Listening on https://${host}:${port}`));
+server.listen(port, host, () => console.log(`\n[ping] Listening on https://${host}:${port}`));
