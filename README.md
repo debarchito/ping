@@ -20,7 +20,7 @@ any sensitive information on **ping.** instances.
   dashboard.
 - [Socket.IO](https://socket.io) for bidirectional real-time communication.
 
-### 2. Build (direnv)
+### 2. Develop and Build (direnv)
 
 > **NOTE:** The installation steps assume you are using a UNIX-like system. If
 > you are using Windows, use _WSL2_ to build and run this project.
@@ -84,7 +84,10 @@ pnpm start
 PocketBase should automatically run the migrations and **ping.** should be ready
 to use!
 
-### 3. Build (standard)
+> **NOTE:** Use `pnpm dev` instead of `pnpm build + pnpm start` to start
+> the development server.
+
+### 3. Develop and Build (standard)
 
 Install [pnpm](https://pnpm.io) globally using either _curl_ or _wget_.
 
@@ -161,6 +164,9 @@ pnpm start
 
 PocketBase should automatically run the migrations and **ping.** should be ready
 to use!
+
+> **NOTE:** Use `pnpm dev` instead of `pnpm build + pnpm start` to start
+> the development server.
 
 ### 4. License
 
