@@ -45,7 +45,25 @@ cp .env.example .env
 # account.
 ```
 
-Direnv should automatically load them. Now, it's time to build **ping.**
+Direnv should automatically load them. Now, it's time to generate local
+development certificates. You can use
+[mkcert](https://github.com/FiloSottile/mkcert) (included in
+[flake.nix](/flake.nix)) for this particular purpose.
+
+```sh
+# Install the CA
+mkcert -install
+# The generated pem for the CA should be at:
+# ~/.locals/share/mkcert/rootCA.pem
+# For Firefox, you can import it under:
+# Settings > Privacy & Security > Certificates > View Certificates > Import
+
+# Generate certificates
+mkdir cert
+cd cert && mkcert -key-file key.pem -cert-file cert.pem localhost
+```
+
+Now, it's time to build **ping.**
 
 ```sh
 pnpm install && pnpm build
@@ -105,6 +123,22 @@ Manually load the environment variables:
 
 ```
 source .env
+```
+
+Now, it's time to generate local development certificates. You can use
+[mkcert](https://github.com/FiloSottile/mkcert) for this particular purpose.
+
+```sh
+# Install the CA
+mkcert -install
+# The generated pem for the CA should be at:
+# ~/.locals/share/mkcert/rootCA.pem
+# For Firefox, you can import it under:
+# Settings > Privacy & Security > Certificates > View Certificates > Import
+
+# Generate certificates
+mkdir cert
+cd cert && mkcert -key-file key.pem -cert-file cert.pem localhost
 ```
 
 Now, it's time to build **ping.**
