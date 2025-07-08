@@ -5,8 +5,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function isValidName(username: string) {
-  return isValidDisplayname(username) && /^[a-z0-9_-]+$/.test(username);
+export function isValidName(name: string) {
+  return name.length >= 3 && name.length <= 64 && /^[a-z0-9_-]+$/.test(name);
 }
 
 export function isValidPassword(password: string) {
@@ -15,12 +15,8 @@ export function isValidPassword(password: string) {
   );
 }
 
-export function isValidDisplayname(roomname: string) {
-  return roomname.length >= 3 && roomname.length <= 64;
-}
-
 export function redirectToMeOnSignIn(url: URL) {
-  return `/sign-in?redirectTo=${url.pathname + url.search}`;
+  return `/sign-in?redirect-to=${url.pathname + url.search}`;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
