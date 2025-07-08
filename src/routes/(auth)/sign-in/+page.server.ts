@@ -3,11 +3,14 @@ import { redirect, fail } from "@sveltejs/kit";
 import { isValidPassword } from "$lib/utils";
 import isEmail from "validator/lib/isEmail";
 
+const getRedirectUrl = (url: URL) => {
+  const redirectTo = url.searchParams.get("redirect-to");
+  return redirectTo ? `/${redirectTo.slice(1)}` : "/room/list";
+};
+
 export const load: PageServerLoad = async ({ locals, url }) => {
   if (locals.user) {
-    const redirectTo = url.searchParams.get("redirect-to");
-    if (redirectTo) return redirect(307, `/${redirectTo.slice(1)}`);
-    return redirect(307, "/room/list");
+    return redirect(307, getRedirectUrl(url));
   }
 
   return {};
@@ -20,8 +23,8 @@ export const actions: Actions = {
     }
 
     const formData = await request.formData();
-    const email = formData.get("email")?.toString() || "";
-    const password = formData.get("password")?.toString() || "";
+    const email = formData.get("email")?.toString() ?? "";
+    const password = formData.get("password")?.toString() ?? "";
 
     if (!isEmail(email) || !isValidPassword(password)) {
       return fail(401, { message: "Invalid credentials." });
@@ -40,8 +43,6 @@ export const actions: Actions = {
       return fail(500, { message: "An unexpected error occurred. Please try again later." });
     }
 
-    const redirectTo = url.searchParams.get("redirect-to");
-    if (redirectTo) return redirect(307, `/${redirectTo.slice(1)}`);
-    return redirect(307, "/room/list");
+    return redirect(307, getRedirectUrl(url));
   },
 };

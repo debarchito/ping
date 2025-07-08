@@ -1,8 +1,8 @@
 <script lang="ts">
   import { page } from "$app/state";
   import { enhance } from "$app/forms";
+  import * as Lucide from "@lucide/svelte";
   import { isValidPassword } from "$lib/utils";
-  import { Check, TriangleAlert } from "@lucide/svelte";
   import * as Card from "$lib/components/ui/card/index.js";
   import { Input } from "$lib/components/ui/input/index.js";
   import { Label } from "$lib/components/ui/label/index.js";
@@ -103,22 +103,22 @@
             type="submit"
             class="w-full transition-all hover:scale-105"
             disabled={passwordMismatch || !validPassword}
-          >
-            <Check />
+            >Lucide.
+            <Lucide.Check />
             Sign Up
           </Button>
         </form>
 
         {#if form?.message}
-          <Alert.Root variant="destructive" class="mt-4">
-            <TriangleAlert />
+          <Alert.Root variant="destructive">
+            <Lucide.TriangleAlert />
             <Alert.Description class="max-w-70">
               <span>{form?.message}</span>
             </Alert.Description>
           </Alert.Root>
         {:else if password.length !== 0 && !validPassword}
-          <Alert.Root variant="destructive" class="mt-4">
-            <TriangleAlert />
+          <Alert.Root variant="destructive">
+            <Lucide.TriangleAlert />
             <Alert.Description class="max-w-70">
               <span>
                 Password must be at-least 8 chars and include a-z, A-Z, 0-9, and a special
@@ -127,15 +127,15 @@
             </Alert.Description>
           </Alert.Root>
         {:else if passwordMismatch}
-          <Alert.Root variant="destructive" class="mt-4">
-            <TriangleAlert />
+          <Alert.Root variant="destructive">
+            <Lucide.TriangleAlert />
             <Alert.Description class="max-w-70">
               <span>Repeated password is not the same.</span>
             </Alert.Description>
           </Alert.Root>
         {/if}
 
-        <div class="mt-2 text-center text-sm">
+        <div class="text-center text-sm">
           Already have an account?
           <a href={`/sign-in${url.search}`} class="underline">Sign in</a>
         </div>

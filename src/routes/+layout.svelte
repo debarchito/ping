@@ -6,5 +6,4 @@
 </script>
 
 <ModeWatcher />
-
 {@render children()}

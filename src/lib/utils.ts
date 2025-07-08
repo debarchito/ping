@@ -6,7 +6,15 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function isValidName(name: string) {
-  return name.length >= 3 && name.length <= 64 && /^[a-z0-9_-]+$/.test(name);
+  return isValidDisplayName(name) && /^[a-z0-9_-]+$/.test(name);
+}
+
+export function isValidDisplayName(name: string) {
+  return name.length >= 3 && name.length <= 64;
+}
+
+export function isValidRoomDescription(description: string) {
+  return description.length >= 1 && description.length <= 200;
 }
 
 export function isValidPassword(password: string) {

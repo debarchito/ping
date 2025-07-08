@@ -3,11 +3,14 @@ import type { PageServerLoad, Actions } from "./$types";
 import { redirect, fail } from "@sveltejs/kit";
 import isEmail from "validator/lib/isEmail";
 
+const getRedirectUrl = (url: URL) => {
+  const redirectTo = url.searchParams.get("redirect-to");
+  return redirectTo ? `/${redirectTo.slice(1)}` : "/room/list";
+};
+
 export const load: PageServerLoad = async ({ locals, url }) => {
   if (locals.user) {
-    const redirectTo = url.searchParams.get("redirect-to");
-    if (redirectTo) return redirect(307, `/${redirectTo.slice(1)}`);
-    return redirect(307, "/room/list");
+    return redirect(307, getRedirectUrl(url));
   }
 
   return {};
@@ -20,9 +23,9 @@ export const actions: Actions = {
     }
 
     const formData = await request.formData();
-    const name = formData.get("name")?.toString() || "";
-    const email = formData.get("email")?.toString() || "";
-    const password = formData.get("password")?.toString() || "";
+    const name = formData.get("name")?.toString() ?? "";
+    const email = formData.get("email")?.toString() ?? "";
+    const password = formData.get("password")?.toString() ?? "";
 
     if (!isValidName(name)) {
       return fail(401, {
@@ -37,7 +40,7 @@ export const actions: Actions = {
     if (!isValidPassword(password)) {
       return fail(401, {
         message:
-          "Password must be at least 8 chars and include a-z, A-Z, 0-9, and a special character",
+          "Password must be at least 8 chars and include a-z, A-Z, 0-9, and a special character.",
       });
     }
 
@@ -54,15 +57,15 @@ export const actions: Actions = {
     } catch (err: any) {
       locals.logger.error(err);
 
-      if (err?.status === 400 && err?.data?.message === "Failed to create record.") {
-        return fail(401, { message: "Unusable credentials." });
+      if (err?.status === 400 && err?.data?.data?.name?.code === "validation_not_unique") {
+        return fail(401, { message: "Unusable credentials. Try something else." });
       }
 
-      return fail(500, { message: "An unexpected error occurred. Please try again later." });
+      return fail(500, {
+        message: "An unexpected error occurred. Please try again later.",
+      });
     }
 
-    const redirectTo = url.searchParams.get("redirect-to");
-    if (redirectTo) return redirect(307, `/${redirectTo.slice(1)}`);
-    return redirect(307, "/room/list");
+    return redirect(307, getRedirectUrl(url));
   },
 };

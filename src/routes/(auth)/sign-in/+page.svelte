@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from "$app/state";
   import { enhance } from "$app/forms";
-  import { LogIn, TriangleAlert } from "@lucide/svelte";
+  import * as Lucide from "@lucide/svelte";
   import * as Card from "$lib/components/ui/card/index.js";
   import { Input } from "$lib/components/ui/input/index.js";
   import { Label } from "$lib/components/ui/label/index.js";
@@ -51,21 +51,21 @@
           </div>
 
           <Button type="submit" class="w-full transition-all hover:scale-105">
-            <LogIn />
+            <Lucide.LogIn />
             Sign In
           </Button>
         </form>
 
         {#if form?.message}
           <Alert.Root variant="destructive">
-            <TriangleAlert />
+            <Lucide.TriangleAlert />
             <Alert.Description class="max-w-70">
               <span>{form.message}</span>
             </Alert.Description>
           </Alert.Root>
         {/if}
 
-        <div class="mt-2 text-center text-sm">
+        <div class="text-center text-sm">
           Don't have an account?
           <a href={`/sign-up${url.search}`} class="underline">Sign up</a>
         </div>

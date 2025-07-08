@@ -1,4 +1,9 @@
-import { isValidName, redirectToMeOnSignIn } from "$lib/utils";
+import {
+  isValidName,
+  isValidDisplayName,
+  isValidRoomDescription,
+  redirectToMeOnSignIn,
+} from "$lib/utils";
 import type { PageServerLoad, Actions } from "./$types";
 import { redirect, fail } from "@sveltejs/kit";
 
@@ -11,47 +16,53 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 };
 
 export const actions: Actions = {
-  "create-room": async ({ locals, request }) => {
+  default: async ({ locals, request }) => {
     if (!locals.user) {
-      return fail(405, { message: "Method Not Allowed" });
+      return fail(405, { message: "Method not allowed." });
     }
 
     const formData = await request.formData();
-    const roomname = formData.get("roomname")?.toString() || "";
-    const roomDescription = formData.get("room-description")?.toString() || "";
+    const name = formData.get("name")?.toString() || "";
+    const displayName = formData.get("displayName")?.toString() || "";
+    const description = formData.get("description")?.toString() || "";
     let roomId: string;
 
-    if (!isValidName(roomname)) {
-      return fail(400, {
-        message: "Room name must be 3 to 64 chars and only use a-z, 0-9, _ or -",
+    if (!isValidName(name)) {
+      return fail(401, {
+        message: "Room name must be between 3 to 64 chars and only use a-z, 0-9, _ or -.",
       });
     }
 
-    if (!(roomDescription.length >= 1 && roomDescription.length <= 200)) {
-      return fail(400, {
-        message: "Room description can be at most 200 chars",
+    if (displayName && !isValidDisplayName(displayName)) {
+      return fail(401, {
+        message: "Display name must be between 3 to 64 chars.",
+      });
+    }
+
+    if (description && !isValidRoomDescription(description)) {
+      return fail(401, {
+        message: "Room description must be between 1 to 200 chars.",
       });
     }
 
     try {
-      const existingRoom = await locals.pb.collection("rooms").getList(1, 1, {
-        filter: `name = "${roomname}"`,
-      });
-
-      if (existingRoom.items.length > 0) {
-        return fail(400, { message: "A room with this name already exists" });
-      }
-
       const room = await locals.pb.collection("rooms").create({
         userId: locals.user.id,
-        name: roomname,
-        description: roomDescription,
+        name,
+        displayName,
+        description,
       });
 
       roomId = room.id;
-    } catch (err) {
-      console.log("[! /room/create] =>", err);
-      return fail(500, { message: "Oops...something went wrong" });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      locals.logger.error(err);
+
+      if (err?.status === 400 && err?.data?.data?.name?.code === "validation_not_unique") {
+        return fail(401, { message: "A room with this name already exists." });
+      }
+
+      return fail(500, { message: "An unexpected error occurred. Please try again later." });
     }
 
     return redirect(307, `/room/r/${roomId}`);
