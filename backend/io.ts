@@ -82,7 +82,6 @@ export default async function injectSocketIO(server: HttpServer) {
         let name = "<malformed>";
 
         if (users) {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           for (const [_, userInfo] of users.entries()) {
             if (userInfo.userId === message.userId) {
               name = userInfo.name;
