@@ -3,7 +3,7 @@ import type { ViteDevServer } from "vite";
 
 export const socketIOServer = {
   name: "socketIOServer",
-  configureServer(server: ViteDevServer) {
-    injectSocketIO(server.httpServer!);
+  async configureServer(server: ViteDevServer) {
+    await injectSocketIO(server.httpServer!);
   },
 };

@@ -1,4 +1,18 @@
 import type { PageServerLoad, Actions } from "./$types";
+import { env } from "$env/dynamic/private";
+import { io } from "socket.io-client";
+
+const ip = env.ENV == "production" ? env.PING_IP : env.PING_DEV_IP;
+const socket = io(ip, {
+  reconnection: true,
+  reconnectionAttempts: Infinity,
+  reconnectionDelay: 1000,
+  transports: ["websocket", "polling"],
+  rejectUnauthorized: env.DEPLOYED === "1",
+});
+
+socket.on("connect", () => console.log("[socket.io] Connected to service"));
+socket.on("connect_error", (err) => console.log("[socket.io] Connection error:", err));
 
 export const load: PageServerLoad = async ({ url, locals }) => {
   const id = url.pathname.split("/").pop() || "";
@@ -26,7 +40,7 @@ export const load: PageServerLoad = async ({ url, locals }) => {
             .map((message) => {
               return {
                 ...message,
-                user: message.expand?.userId || { name: "Unknown User" },
+                user: message.expand?.userId || { name: "<malformed>" },
               };
             })
             .reverse(),
@@ -34,7 +48,8 @@ export const load: PageServerLoad = async ({ url, locals }) => {
       },
     };
   } catch (err) {
-    console.log("[ /room/r/[id]] =>", err);
+    locals.logger.error(err);
+
     return { status: 404, message: "Not Found", payload: null };
   }
 };
@@ -42,9 +57,9 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 export const actions: Actions = {
   "load-more": async ({ request, locals }) => {
     const formData = await request.formData();
-    const id = formData.get("roomId") as string;
-    const page = parseInt(formData.get("page") as string) || 1;
-    const perPage = parseInt(formData.get("perPage") as string) || 10;
+    const id = formData.get("roomId")?.toString() ?? "";
+    const page = parseInt(formData.get("page")?.toString() ?? "1");
+    const perPage = parseInt(formData.get("perPage")?.toString() ?? "10");
 
     try {
       const messages = await locals.pb.collection("messages").getList(page, perPage, {
@@ -66,7 +81,7 @@ export const actions: Actions = {
               .map((message) => {
                 return {
                   ...message,
-                  user: message.expand?.userId || { name: "Unknown User" },
+                  user: message.expand?.userId || { name: "<malformed>" },
                 };
               })
               .reverse(),
@@ -74,15 +89,24 @@ export const actions: Actions = {
         },
       };
     } catch (err) {
-      console.log("[/room/r/[id]] =>", err);
+      locals.logger.error(err);
+
       return { status: 500, message: "Failed to load messages", payload: null };
     }
   },
   message: async ({ request, locals }) => {
+    if (!locals.user) {
+      return {
+        status: 401,
+        message: "Method not allowed",
+        payload: null,
+      };
+    }
+
     const formData = await request.formData();
-    const userId = formData.get("userId") as string;
-    const roomId = formData.get("roomId") as string;
-    const content = formData.get("content") as string;
+    const userId = formData.get("userId")?.toString();
+    const roomId = formData.get("roomId")?.toString();
+    let content = formData.get("content")?.toString();
 
     if (!userId || !roomId || !content) {
       return {
@@ -92,11 +116,44 @@ export const actions: Actions = {
       };
     }
 
+    content = content
+      .replace(/[<>\\]/g, (char) => {
+        const replacements = {
+          "<": "&lt;",
+          ">": "&gt;",
+          "\\": "&#92;",
+        };
+        return replacements[char as keyof typeof replacements];
+      })
+      .replace(/(?<![\\])\*(.*?)(?<![\\])\*/g, "<strong>$1</strong>")
+      .replace(/(?<![\\])_(.*?)(?<![\\])_/g, "<em>$1</em>")
+      .replace(/(?<![\\])~(.*?)(?<![\\])~/g, "<del>$1</del>")
+      .replace(/(?<![\\])__(.*?)(?<![\\])__/g, "<u>$1</u>")
+      .replace(/\\\*/g, "*")
+      .replace(/\\_/g, "_")
+      .replace(/\\~/g, "~")
+      .replace(/\\__/g, "__");
+
     try {
       const message = await locals.pb.collection("messages").create({
         userId,
         roomId,
         content,
+      });
+
+      const encoder = new TextEncoder();
+      const passwordData = encoder.encode(env.POCKETBASE_SUPERUSER_PASSWORD || "");
+      const serverTokenBuffer = await crypto.subtle.digest("SHA-256", passwordData);
+      const serverToken = Array.from(new Uint8Array(serverTokenBuffer))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+
+      socket.emit("send_message", {
+        roomId,
+        userId,
+        content,
+        created: new Date().toISOString(),
+        token: serverToken,
       });
 
       return {
@@ -105,7 +162,8 @@ export const actions: Actions = {
         payload: { message },
       };
     } catch (err) {
-      console.log("[/room/r/[id]] message action =>", err);
+      locals.logger.error(err);
+
       return { status: 500, message: "Failed to send message", payload: null };
     }
   },

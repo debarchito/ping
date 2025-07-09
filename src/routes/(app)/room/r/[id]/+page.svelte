@@ -1,35 +1,22 @@
 <script lang="ts">
-  import type { PageProps } from "./$types";
-  import { Card, CardContent } from "$lib/components/ui/card";
-  import { Button } from "$lib/components/ui/button";
-  import { Input } from "$lib/components/ui/input";
-  import * as Chat from "$lib/components/ui/chat";
-  import * as EmojiPicker from "$lib/components/ui/emoji-picker";
-  import * as Popover from "$lib/components/ui/popover";
-  import { LightSwitch } from "$lib/components/ui/light-switch";
-  import * as Tooltip from "$lib/components/ui/tooltip";
-  import {
-    AlertCircle,
-    MessageCircle,
-    SmilePlusIcon,
-    SendHorizontal,
-    LogIn,
-    LogOut,
-    ArrowLeft,
-    ChevronUpIcon,
-    ChevronDownIcon,
-    Loader2,
-    UserX,
-  } from "@lucide/svelte";
   import { cn } from "$lib/utils";
-  import { UseAutoScroll } from "$lib/hooks/use-auto-scroll.svelte";
-  import { goto } from "$app/navigation";
   import { enhance } from "$app/forms";
-  import { io, type Socket } from "socket.io-client";
+  import { io } from "socket.io-client";
   import { toast } from "svelte-sonner";
+  import { goto } from "$app/navigation";
+  import * as Lucide from "@lucide/svelte";
+  import * as Chat from "$lib/components/ui/chat";
+  import * as Card from "$lib/components/ui/card";
+  import { Input } from "$lib/components/ui/input";
+  import * as Popover from "$lib/components/ui/popover";
+  import * as Tooltip from "$lib/components/ui/tooltip";
   import { Toaster } from "$lib/components/ui/sonner/index.js";
+  import { LightSwitch } from "$lib/components/ui/light-switch";
+  import * as EmojiPicker from "$lib/components/ui/emoji-picker";
+  import { UseAutoScroll } from "$lib/hooks/use-auto-scroll.svelte";
+  import { Button, buttonVariants } from "$lib/components/ui/button";
 
-  let { data }: PageProps = $props();
+  let { data } = $props();
   let message = $state("");
   let emojiPickerOpen = $state(false);
   let loadingMoreMessages = $state(false);
@@ -40,114 +27,101 @@
   let scrollHeight = 0;
   let scrollPosition = 0;
   let isAtBottom = $state(true);
-  let socket = $state<Socket | null>(null);
+  let socket = io("/");
   let connected = $state(false);
   let sendingMessage = $state(false);
-
-  // Track processed events to prevent duplicates
   let processedEvents = $state(new Map<string, number>());
 
   const autoScroll = new UseAutoScroll();
 
-  if (data.status === 200 && data.payload?.room?.id) {
-    socket = io("/");
-
-    socket.on("connect", () => {
-      connected = true;
-      const roomId = data.payload!.room.id;
-      const isAuthenticated = !!data.payload?.user;
-
-      // Join the room
-      socket.emit("join_room", {
-        roomId,
-        username: data.payload?.user?.name || "Anonymous",
-        userId: data.payload?.user?.id,
-        isAuthenticated,
-      });
-    });
-
-    socket.on("new_message", (newMsg: MessageItem) => {
-      if (newMsg.roomId === data.payload!.room.id) {
-        allMessages = [...allMessages, newMsg];
-        if (isAtBottom) {
-          setTimeout(smoothScrollToBottom, 100);
-        }
-      }
-    });
-
-    socket.on("user_joined", (joinInfo: { roomId: string; username: string }) => {
-      if (
-        joinInfo.roomId === data.payload!.room.id &&
-        joinInfo.username !== data.payload?.user?.name
-      ) {
-        // Create a unique key for this event
-        const eventKey = `join:${joinInfo.roomId}:${joinInfo.username}`;
-        const now = Date.now();
-
-        // Check if we've processed this event recently (within 5 seconds)
-        const lastProcessed = processedEvents.get(eventKey);
-        if (lastProcessed && now - lastProcessed < 5000) {
-          return; // Skip duplicate event
-        }
-
-        // Store this event as processed
-        processedEvents.set(eventKey, now);
-
-        // Notify user
-        toast.success(`${joinInfo.username} joined the room`, {
-          description: formatTime(new Date()),
-        });
-
-        if (isAtBottom) {
-          setTimeout(smoothScrollToBottom, 100);
-        }
-      }
-    });
-
-    socket.on("user_left", (leaveInfo: { roomId: string; username: string }) => {
-      if (
-        leaveInfo.roomId === data.payload!.room.id &&
-        leaveInfo.username !== data.payload?.user?.name
-      ) {
-        // Create a unique key for this event
-        const eventKey = `leave:${leaveInfo.roomId}:${leaveInfo.username}`;
-        const now = Date.now();
-
-        // Check if we've processed this event recently (within 5 seconds)
-        const lastProcessed = processedEvents.get(eventKey);
-        if (lastProcessed && now - lastProcessed < 5000) {
-          return; // Skip duplicate event
-        }
-
-        // Store this event as processed
-        processedEvents.set(eventKey, now);
-
-        // Notify user
-        toast.success(`${leaveInfo.username} left the room`, {
-          description: formatTime(new Date()),
-        });
-
-        if (isAtBottom) {
-          setTimeout(smoothScrollToBottom, 100);
-        }
-      }
-    });
-
-    socket.on("disconnect", () => {
-      connected = false;
-    });
-  }
-
   $effect(() => {
+    if (data.status === 200 && data.payload?.room?.id) {
+      socket.on("connect", () => {
+        connected = true;
+        const roomId = data.payload!.room.id;
+
+        socket.emit("join_room", {
+          roomId,
+          userId: data.payload?.user?.id || null,
+        });
+      });
+
+      socket.on("new_message", (newMsg: MessageItem) => {
+        if (newMsg.roomId === data.payload!.room.id) {
+          allMessages = [
+            ...allMessages,
+            {
+              ...newMsg,
+              user: {
+                name: newMsg.userName || "Unknown",
+              },
+            },
+          ];
+
+          if (isAtBottom) {
+            setTimeout(smoothScrollToBottom, 100);
+          }
+        }
+      });
+
+      socket.on("user_joined", (joinInfo: { roomId: string; name: string }) => {
+        if (
+          joinInfo.roomId === data.payload!.room.id &&
+          joinInfo.name !== data.payload?.user?.name
+        ) {
+          const eventKey = `join:${joinInfo.roomId}:${joinInfo.name}`;
+          const now = Date.now();
+
+          const lastProcessed = processedEvents.get(eventKey);
+          if (lastProcessed && now - lastProcessed < 5000) {
+            return;
+          }
+
+          processedEvents.set(eventKey, now);
+
+          toast.success(`${joinInfo.name} joined the room`, {
+            description: formatTime(new Date()),
+          });
+
+          if (isAtBottom) {
+            setTimeout(smoothScrollToBottom, 100);
+          }
+        }
+      });
+
+      socket.on("user_left", (leaveInfo: { roomId: string; username: string }) => {
+        if (
+          leaveInfo.roomId === data.payload!.room.id &&
+          leaveInfo.username !== data.payload?.user?.name
+        ) {
+          const eventKey = `leave:${leaveInfo.roomId}:${leaveInfo.username}`;
+          const now = Date.now();
+
+          const lastProcessed = processedEvents.get(eventKey);
+          if (lastProcessed && now - lastProcessed < 5000) {
+            return;
+          }
+
+          processedEvents.set(eventKey, now);
+
+          toast.success(`${leaveInfo.username} left the room`, {
+            description: formatTime(new Date()),
+          });
+
+          if (isAtBottom) {
+            setTimeout(smoothScrollToBottom, 100);
+          }
+        }
+      });
+
+      socket.on("disconnect", () => {
+        connected = false;
+      });
+    }
+
     return () => {
       if (socket) {
-        if (data.payload?.user) {
-          // Just disconnect without emitting leave_room - the server should handle this
-          // This helps prevent duplicate leave notifications
-          socket.disconnect();
-        } else {
-          socket.disconnect();
-        }
+        socket.disconnect();
       }
     };
   });
@@ -183,30 +157,17 @@
 
     sendingMessage = true;
 
-    return async ({ result }: { result: any }) => {
+    return async ({
+      result,
+    }: {
+      result: { type: string; data?: { status: number; message: string; payload?: unknown } };
+    }) => {
       sendingMessage = false;
 
       if (result.type === "success" && result.data?.status === 200) {
-        // Only emit the message if the server action was successful
-        if (socket && connected) {
-          const newMessage = {
-            content: message.trim(),
-            user: {
-              name: data.payload!.user.name,
-              id: data.payload!.user.id,
-            },
-            roomId: data.payload!.room.id,
-            userId: data.payload!.user.id,
-            created: new Date().toISOString(),
-          };
-          socket.emit("send_message", newMessage);
-        }
-
-        // Clear the message input and scroll to bottom
         message = "";
         smoothScrollToBottom();
       } else {
-        // Show error toast when message sending fails
         toast.error("Failed to send message", {
           description: result.data?.message || "Please try again later",
         });
@@ -288,6 +249,7 @@
     collectionName: string;
     expand?: Record<string, unknown>;
     roomId?: string;
+    userName?: string;
   };
 </script>
 
@@ -309,14 +271,14 @@
         <div class="flex items-center gap-2 sm:gap-3">
           <Tooltip.Provider>
             <Tooltip.Root>
-              <Tooltip.Trigger>
-                <Button
-                  onclick={() => goto("/room/list")}
-                  variant="outline"
-                  class="h-9 w-9 rounded-md shadow-sm transition-shadow hover:shadow-md"
-                >
-                  <ArrowLeft class="size-4" />
-                </Button>
+              <Tooltip.Trigger
+                onclick={() => goto("/room/list")}
+                class={cn(
+                  buttonVariants({ variant: "outline" }),
+                  "flex h-9 w-9 items-center justify-center",
+                )}
+              >
+                <Lucide.ArrowLeft class="size-4" />
               </Tooltip.Trigger>
               <Tooltip.Content>
                 <p>Explore rooms</p>
@@ -326,7 +288,7 @@
           <div
             class="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-full sm:size-10"
           >
-            <MessageCircle class="size-4 sm:size-5" />
+            <Lucide.MessageCircle class="size-4 sm:size-5" />
           </div>
           <div>
             <h1
@@ -341,7 +303,7 @@
             </p>
           </div>
         </div>
-        <div class="sm: flex items-center gap-2">
+        <div class="flex items-center gap-2">
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger>
@@ -351,7 +313,7 @@
                   {#if data.payload?.user}
                     {data.payload?.user.name[0].toUpperCase()}
                   {:else}
-                    <UserX class="size-4" />
+                    <Lucide.UserX class="size-4" />
                   {/if}
                 </div>
               </Tooltip.Trigger>
@@ -379,14 +341,14 @@
           {#if data.payload?.user}
             <Tooltip.Provider>
               <Tooltip.Root>
-                <Tooltip.Trigger>
-                  <Button
-                    onclick={() => goto("/sign-out")}
-                    variant="outline"
-                    class="h-9 w-9 rounded-md shadow-sm transition-shadow hover:shadow-md"
-                  >
-                    <LogOut class="size-4" />
-                  </Button>
+                <Tooltip.Trigger
+                  onclick={() => goto("/sign-out")}
+                  class={cn(
+                    buttonVariants({ variant: "outline" }),
+                    "h-9 w-9 rounded-md shadow-sm transition-shadow hover:shadow-md",
+                  )}
+                >
+                  <Lucide.LogOut class="size-4" />
                 </Tooltip.Trigger>
                 <Tooltip.Content>
                   <p>Sign out</p>
@@ -405,7 +367,7 @@
             class="flex h-full flex-col items-center justify-center px-4 py-8 text-center sm:py-12"
           >
             <div class="bg-muted mb-4 rounded-full p-3 sm:p-4">
-              <MessageCircle class="text-muted-foreground size-6 sm:size-8" />
+              <Lucide.MessageCircle class="text-muted-foreground size-6 sm:size-8" />
             </div>
             <h3 class="text-muted-foreground mb-2 text-base font-medium sm:text-lg">
               No messages yet
@@ -437,10 +399,10 @@
                       disabled={loadingMoreMessages}
                     >
                       {#if loadingMoreMessages}
-                        <Loader2 class="size-4 animate-spin" />
+                        <Lucide.Loader2 class="size-4 animate-spin" />
                         <span>Loading...</span>
                       {:else}
-                        <ChevronUpIcon class="size-4" />
+                        <Lucide.ChevronUpIcon class="size-4" />
                         <span>Load more</span>
                       {/if}
                     </Button>
@@ -449,8 +411,9 @@
               {/if}
 
               {#each allMessages as msg, index (msg.id + "-" + index)}
-                {@const isSentByMe = "userId" in msg && msg.userId === data.payload!.user?.id}
-                {@const username = "name" in msg.user ? msg.user.name : "Unknown"}
+                {@const isSentByMe =
+                  data.payload?.user && msg.user && msg.user.name === data.payload.user.name}
+                {@const username = msg.user?.name || "Unknown"}
                 <Chat.Bubble
                   variant={isSentByMe ? "sent" : "received"}
                   class="shadow-sm transition-all duration-200 hover:translate-y-[-1px] hover:shadow-md"
@@ -476,7 +439,8 @@
                     )}
                   >
                     <p class="text-sm leading-relaxed break-words sm:text-base dark:text-white">
-                      {msg.content ?? ""}
+                      <!-- eslint-disable-next-line svelte/no-at-html-tags @typescript-eslint/no-explicit-any -->
+                      {@html (msg as any).content ?? ""}
                     </p>
                     <div
                       class={cn(
@@ -485,7 +449,8 @@
                       )}
                     >
                       <span class="font-bold">{username}</span>,
-                      {formatTime(msg.created ? new Date(msg.created) : null)}
+                      <!-- eslint-disable-next-line @typescript-eslint/no-explicit-any -->
+                      {formatTime((msg as any).created ? new Date((msg as any).created) : null)}
                     </div>
                   </Chat.BubbleMessage>
                 </Chat.Bubble>
@@ -500,15 +465,11 @@
           >
             <Tooltip.Provider>
               <Tooltip.Root>
-                <Tooltip.Trigger>
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    class="pointer-events-auto h-10 w-10 rounded-full border shadow-md transition-all duration-200 hover:shadow-lg"
-                    onclick={() => smoothScrollToBottom()}
-                  >
-                    <ChevronDownIcon class="size-5" />
-                  </Button>
+                <Tooltip.Trigger
+                  onclick={() => smoothScrollToBottom()}
+                  class="bg-secondary text-secondary-foreground pointer-events-auto h-10 w-10 rounded-full border shadow-md transition-all duration-200 hover:shadow-lg"
+                >
+                  <Lucide.ChevronDownIcon class="size-5" />
                 </Tooltip.Trigger>
                 <Tooltip.Content>
                   <p>Scroll to bottom</p>
@@ -524,14 +485,14 @@
       class="bg-background/95 supports-[backdrop-filter]:bg-background/60 border-t px-3 py-2 backdrop-blur sm:px-4 sm:py-3 md:py-4"
     >
       <div class="mx-auto max-w-4xl">
-        {#if data.payload!.user}
+        {#if data.payload?.user}
           <form
             method="POST"
             action="?/message"
             use:enhance={handleMessageSubmit}
             class="flex place-items-center"
           >
-            <input type="hidden" name="userId" value={data.payload!.user.id} />
+            <input type="hidden" name="userId" value={data.payload.user.id} />
             <input type="hidden" name="roomId" value={data.payload!.room.id} />
             <input type="hidden" name="content" value={message.trim()} />
 
@@ -556,7 +517,7 @@
                     <Popover.Trigger
                       class="text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors"
                     >
-                      <SmilePlusIcon class="size-4 sm:size-5" />
+                      <Lucide.SmilePlusIcon class="size-4 sm:size-5" />
                     </Popover.Trigger>
                     <Popover.Content class="w-auto p-0" side="top" align="start">
                       <EmojiPicker.Search />
@@ -588,9 +549,9 @@
                   disabled={!message.trim() || !connected || sendingMessage}
                 >
                   {#if sendingMessage}
-                    <Loader2 class="size-4 animate-spin" />
+                    <Lucide.Loader2 class="size-4 animate-spin" />
                   {:else}
-                    <SendHorizontal class="size-4 sm:size-5" />
+                    <Lucide.SendHorizontal class="size-4 sm:size-5" />
                   {/if}
                 </Button>
               </div>
@@ -606,7 +567,7 @@
               class="flex w-full items-center gap-2 shadow-sm transition-all hover:shadow-md sm:w-auto"
               size="sm"
             >
-              <LogIn class="size-4" />
+              <Lucide.LogIn class="size-4" />
             </Button>
           </div>
         {/if}
@@ -615,11 +576,11 @@
   </div>
 {:else}
   <div class="flex min-h-screen items-center justify-center p-4">
-    <Card class="w-full max-w-md">
-      <CardContent class="pt-6">
+    <Card.Root class="w-full max-w-md">
+      <Card.Content class="pt-6">
         <div class="flex flex-col items-center space-y-4 text-center">
           <div class="rounded-full bg-red-100 p-3 dark:bg-red-900/20">
-            <AlertCircle class="h-8 w-8 text-red-600 dark:text-red-400" />
+            <Lucide.AlertCircle class="size-10 text-red-600 dark:text-red-400" />
           </div>
           <div class="space-y-3">
             <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
@@ -631,7 +592,7 @@
             </p>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </Card.Content>
+    </Card.Root>
   </div>
 {/if}

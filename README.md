@@ -37,12 +37,21 @@ Once the development shell is ready, prepare the environment variables:
 cp .env.example .env
 # PING_HOST (default: 0.0.0.0)
 # PING_PORT (default: 8080)
+#
+# PING_IP (default: https://${PING_HOST}:${PING_PORT})
+# PING_DEV_IP (default: https://localhost:5173)
+# These IP's are used by the server to connect to the Socket.IO
+# service.
+#
 # POCKETBASE_HOST (default: 0.0.0.0)
 # POCKETBASE_PORT (default: 8090)
 # POCKETBASE_URL (default: http://$POCKETBASE_HOST:$POCKETBASE_PORT)
 # POCKETBASE_SUPERUSER_EMAIL and POCKETBASE_SUPERUSER_PASSWORD must be
 # set beforehand. Put credentials you'll later use to create the superuser
 # account.
+#
+# DEPLOYED (default: 0)
+# Only set it to 1, when a Trusted CA assigns a TLS certificate.
 ```
 
 Direnv should automatically load them. Now, it's time to generate local
@@ -78,7 +87,7 @@ pocketbase superuser create $POCKETBASE_SUPERUSER_EMAIL $POCKETBASE_SUPERUSER_PA
 Finally, run **ping.** using:
 
 ```sh
-pnpm start
+ENV=production pnpm start
 ```
 
 PocketBase should automatically run the migrations and **ping.** should be ready
@@ -114,12 +123,21 @@ Next, prepare the environment variables:
 cp .env.example .env
 # PING_HOST (default: 0.0.0.0)
 # PING_PORT (default: 8080)
+#
+# PING_IP (default: https://${PING_HOST}:${PING_PORT})
+# PING_DEV_IP (default: https://localhost:5173)
+# These IP's are used by the server to connect to the Socket.IO
+# service.
+#
 # POCKETBASE_HOST (default: 0.0.0.0)
 # POCKETBASE_PORT (default: 8090)
 # POCKETBASE_URL (default: http://$POCKETBASE_HOST:$POCKETBASE_PORT)
 # POCKETBASE_SUPERUSER_EMAIL and POCKETBASE_SUPERUSER_PASSWORD must be
 # set beforehand. Put credentials you'll later use to create the superuser
 # account.
+#
+# DEPLOYED (default: 0)
+# Only set it to 1, when a Trusted CA assigns a TLS certificate.
 ```
 
 Manually load the environment variables:
@@ -159,7 +177,7 @@ pocketbase superuser create $POCKETBASE_SUPERUSER_EMAIL $POCKETBASE_SUPERUSER_PA
 Finally, run **ping.** using:
 
 ```sh
-pnpm start
+ENV=production pnpm start
 ```
 
 PocketBase should automatically run the migrations and **ping.** should be ready

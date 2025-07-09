@@ -1,13 +1,14 @@
 <script lang="ts">
+  import { cn } from "$lib/utils";
   import { page } from "$app/state";
   import { goto } from "$app/navigation";
   import * as Lucide from "@lucide/svelte";
   import * as Card from "$lib/components/ui/card/index.js";
   import { Input } from "$lib/components/ui/input/index.js";
-  import { Button } from "$lib/components/ui/button/index.js";
   import * as Tooltip from "$lib/components/ui/tooltip/index.js";
   import * as Pagination from "$lib/components/ui/pagination/index.js";
   import { LightSwitch } from "$lib/components/ui/light-switch/index.js";
+  import { Button, buttonVariants } from "$lib/components/ui/button/index.js";
 
   const { data } = $props();
   let searchQuery = $state(data.search || "");
@@ -83,29 +84,27 @@
 
         <Tooltip.Provider>
           <Tooltip.Root>
-            <Tooltip.Trigger
-              ><div class="flex h-9 items-center"><LightSwitch /></div></Tooltip.Trigger
-            >
+            <Tooltip.Trigger>
+              <div class="flex h-9 items-center"><LightSwitch /></div>
+            </Tooltip.Trigger>
             <Tooltip.Content><p>Switch theme</p></Tooltip.Content>
           </Tooltip.Root>
         </Tooltip.Provider>
 
         <Tooltip.Provider>
           <Tooltip.Root>
-            <Tooltip.Trigger>
-              <div class="flex h-9 items-center">
-                <Button
-                  onclick={() => goto(data.user ? "/sign-out" : "/sign-in")}
-                  variant="outline"
-                  class="h-9 w-9 rounded-md shadow-sm transition-shadow hover:shadow-md"
-                >
-                  {#if data.user}
-                    <Lucide.LogOut class="size-4" />
-                  {:else}
-                    <Lucide.LogIn class="size-4" />
-                  {/if}
-                </Button>
-              </div>
+            <Tooltip.Trigger
+              onclick={() => goto(data.user ? "/sign-out" : "/sign-in")}
+              class={cn(
+                buttonVariants({ variant: "outline" }),
+                "flex h-9 w-9 items-center justify-center rounded-md border shadow-sm transition-shadow hover:shadow-md",
+              )}
+            >
+              {#if data.user}
+                <Lucide.LogOut class="size-4" />
+              {:else}
+                <Lucide.LogIn class="size-4" />
+              {/if}
             </Tooltip.Trigger>
             <Tooltip.Content><p>{data.user ? "Sign out" : "Sign in"}</p></Tooltip.Content>
           </Tooltip.Root>

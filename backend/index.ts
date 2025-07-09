@@ -16,6 +16,6 @@ const server = createServer(
 const port = Number(process.env.PING_PORT) || 3000;
 const host = process.env.PING_HOST || "0.0.0.0";
 
-injectSocketIO(server);
+await injectSocketIO(server);
 app.use(handler);
 server.listen(port, host, () => console.log(`\n[ping] Listening on https://${host}:${port}`));
