@@ -39,7 +39,7 @@ any sensitive information on **ping.** instances.
 ### 3. Develop and build (direnv)
 
 > **NOTE:** The installation steps assume you are using a UNIX-like system. If
-> you are using Windows, use _WSL2_ to build and run this project.
+> you are on Windows, use _WSL2_ to build and run this project.
 
 This project can be scaffold with [direnv](https://direnv.net) using:
 
