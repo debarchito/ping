@@ -23,7 +23,7 @@ any sensitive information on **ping.** instances.
 ### 2. Some future considerations
 
 - Currently, the real-time functionality is powered by _Socket.IO_ which
-  defaults to _WebSockets_ while using _long polling_ in case _WebSockets_ are
+  defaults to _WebSockets_ while using _long polling_ in cases _WebSockets_ are
   not available. The current implementation works but contains a lot of hacks to
   make it work with _SvelteKit_, which isn't very elegant. To my pleasure,
   _PocketBase_ has a [realtime API](https://pocketbase.io/docs/api-realtime)
