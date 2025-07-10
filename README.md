@@ -20,7 +20,23 @@ any sensitive information on **ping.** instances.
   dashboard.
 - [Socket.IO](https://socket.io) for bidirectional real-time communication.
 
-### 2. Develop and Build (direnv)
+### 2. Some future considerations
+
+- Currently, the real-time functionality is powered by _Socket.IO_ which
+  defaults to _WebSockets_ while using _long polling_ in case _WebSockets_ are
+  not available. The current implementation works but contains a lot of hacks to
+  make it work with _SvelteKit_, which isn't very elegant. To my pleasure,
+  _PocketBase_ has a [realtime API](https://pocketbase.io/docs/api-realtime)
+  which makes use of **SSE** (Server Side Events). I discovered it a bit too
+  late but nonetheless, I plan to transition in future.
+- **ping.** requires a TLS certificate for both development and production as it
+  makes use of _secure cookies_. Ideally, you'd want the production certificate
+  to be handled by a reverse proxy/web server e.g. [NGINX](https://nginx.org) or
+  [Caddy](https://caddyserver.com). This is something I want to address in the
+  future as the current production setup requires manual TLS setup.
+- Dockerize the whole thing and make it even easier to deploy!
+
+### 3. Develop and build (direnv)
 
 > **NOTE:** The installation steps assume you are using a UNIX-like system. If
 > you are using Windows, use _WSL2_ to build and run this project.
@@ -93,10 +109,10 @@ ENV=production pnpm start
 PocketBase should automatically run the migrations and **ping.** should be ready
 to use!
 
-> **NOTE:** Use `pnpm dev` instead of `pnpm build + pnpm start` to start
-> the development server.
+> **NOTE:** Use `pnpm dev` instead of `pnpm build + pnpm start` to start the
+> development server.
 
-### 3. Develop and Build (standard)
+### 4. Develop and build (standard)
 
 Install [pnpm](https://pnpm.io) globally using either _curl_ or _wget_.
 
@@ -183,9 +199,9 @@ ENV=production pnpm start
 PocketBase should automatically run the migrations and **ping.** should be ready
 to use!
 
-> **NOTE:** Use `pnpm dev` instead of `pnpm build + pnpm start` to start
-> the development server.
+> **NOTE:** Use `pnpm dev` instead of `pnpm build + pnpm start` to start the
+> development server.
 
-### 4. License
+### 5. License
 
 This project is licensed under [zlib License](/LICENSE).
