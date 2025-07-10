@@ -33,7 +33,7 @@ any sensitive information on **ping.** instances.
   makes use of _secure cookies_. Ideally, you'd want the production certificate
   to be handled by a reverse proxy/web server e.g. [NGINX](https://nginx.org) or
   [Caddy](https://caddyserver.com). This is something I want to address in the
-  future as the current production setup requires manual TLS setup.
+  future as the current production build requires manual TLS setup.
 - Dockerize the whole thing and make it even easier to deploy!
 
 ### 3. Develop and build (direnv)
