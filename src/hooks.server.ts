@@ -60,7 +60,7 @@ function pocketbase(): Handle {
       "set-cookie",
       event.locals.pb.authStore.exportToCookie({
         secure: true,
-        sameSite: "lax",
+        sameSite: true,
         path: "/",
       }),
     );
