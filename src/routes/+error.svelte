@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Card, CardContent } from "$lib/components/ui/card";
-  import { AlertCircle } from "@lucide/svelte";
+  import * as Card from "$lib/components/ui/card";
+  import * as Lucide from "@lucide/svelte";
   import { page } from "$app/state";
 </script>
 
@@ -9,11 +9,11 @@
 </svelte:head>
 
 <div class="flex min-h-screen items-center justify-center p-4">
-  <Card class="w-full max-w-md">
-    <CardContent class="pt-6">
+  <Card.Root class="w-full max-w-md">
+    <Card.Content class="pt-6">
       <div class="flex flex-col items-center space-y-4 text-center">
         <div class="rounded-full bg-red-100 p-3 dark:bg-red-900/20">
-          <AlertCircle class="size-10 text-red-600 dark:text-red-400" />
+          <Lucide.AlertCircle class="size-10 text-red-600 dark:text-red-400" />
         </div>
         <div class="space-y-3">
           <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
@@ -25,6 +25,6 @@
           </p>
         </div>
       </div>
-    </CardContent>
-  </Card>
+    </Card.Content>
+  </Card.Root>
 </div>
