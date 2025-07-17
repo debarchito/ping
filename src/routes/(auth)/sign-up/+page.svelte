@@ -103,7 +103,7 @@
             type="submit"
             class="w-full transition-all hover:scale-105"
             disabled={passwordMismatch || !validPassword}
-            >Lucide.
+          >
             <Lucide.Check />
             Sign Up
           </Button>
