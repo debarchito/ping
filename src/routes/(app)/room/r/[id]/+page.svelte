@@ -467,7 +467,7 @@
               <Tooltip.Root>
                 <Tooltip.Trigger
                   onclick={() => smoothScrollToBottom()}
-                  class="bg-secondary text-secondary-foreground pointer-events-auto h-10 w-10 rounded-full border shadow-md transition-all duration-200 hover:shadow-lg"
+                  class="bg-secondary text-secondary-foreground pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full border shadow-md transition-all duration-200 hover:shadow-lg"
                 >
                   <Lucide.ChevronDownIcon class="size-5" />
                 </Tooltip.Trigger>
