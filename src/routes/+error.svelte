@@ -1,5 +1,5 @@
 <script lang="ts">
-  import * as Card from "$lib/components/ui/card";
+  import * as Card from "$lib/components/ui/card/index.js";
   import * as Lucide from "@lucide/svelte";
   import { page } from "$app/state";
 </script>
@@ -18,7 +18,7 @@
         <div class="space-y-3">
           <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
             <span class="text-red-600 dark:text-red-400">{page.status}:</span>
-            {page.error?.message}
+            {page.error?.message} f f
           </h2>
           <p class="mt-5 text-sm">
             Continue <a href="/room/list" class="underline">exploring rooms</a>

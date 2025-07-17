@@ -15,7 +15,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
   const rooms = await locals.pb.collection("rooms").getList(page, perPage, {
     sort: "-created",
-    filter: filter,
+    filter,
   });
 
   return {
@@ -25,6 +25,6 @@ export const load: PageServerLoad = async ({ locals, url }) => {
     totalPages: rooms.totalPages,
     page: rooms.page,
     perPage: rooms.perPage,
-    search: search,
+    search,
   };
 };

@@ -563,7 +563,7 @@
           >
             <p class="text-sm sm:text-base">You need to sign in to send messages in this room</p>
             <Button
-              onclick={() => goto(`/sign-in?redirectTo=/room/r/${data.payload?.room.id}`)}
+              onclick={() => goto(`/sign-in?redirect-to=/room/r/${data.payload?.room.id}`)}
               class="flex w-full items-center gap-2 shadow-sm transition-all hover:shadow-md sm:w-auto"
               size="sm"
             >

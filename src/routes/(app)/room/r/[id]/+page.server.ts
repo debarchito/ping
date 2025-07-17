@@ -125,6 +125,10 @@ export const actions: Actions = {
         };
         return replacements[char as keyof typeof replacements];
       })
+      .replace(
+        /(?<![\\])\[(.*?)\]/g,
+        '<a href="$1" class="underline" target="_blank" rel="noopener noreferrer">$1</a>',
+      )
       .replace(/(?<![\\])\*(.*?)(?<![\\])\*/g, "<strong>$1</strong>")
       .replace(/(?<![\\])_(.*?)(?<![\\])_/g, "<em>$1</em>")
       .replace(/(?<![\\])~(.*?)(?<![\\])~/g, "<del>$1</del>")
@@ -132,7 +136,9 @@ export const actions: Actions = {
       .replace(/\\\*/g, "*")
       .replace(/\\_/g, "_")
       .replace(/\\~/g, "~")
-      .replace(/\\__/g, "__");
+      .replace(/\\__/g, "__")
+      .replace(/\\\[/g, "[")
+      .replace(/\\\]/g, "]");
 
     try {
       const message = await locals.pb.collection("messages").create({

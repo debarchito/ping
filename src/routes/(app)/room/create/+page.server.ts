@@ -28,19 +28,19 @@ export const actions: Actions = {
     let roomId: string;
 
     if (!isValidName(name)) {
-      return fail(401, {
+      return fail(400, {
         message: "Room name must be between 3 to 64 chars and only use a-z, 0-9, _ or -.",
       });
     }
 
     if (displayName && !isValidDisplayName(displayName)) {
-      return fail(401, {
+      return fail(400, {
         message: "Display name must be between 3 to 64 chars.",
       });
     }
 
     if (description && !isValidRoomDescription(description)) {
-      return fail(401, {
+      return fail(400, {
         message: "Room description must be between 1 to 200 chars.",
       });
     }
