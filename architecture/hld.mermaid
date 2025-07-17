@@ -1,0 +1,61 @@
+graph TD
+
+User[User] -->|Visit Site| SvelteKit
+
+subgraph Frontend
+    SvelteKit[SvelteKit: Routes and Pages]
+    SocketClient[Socket.IO Client]
+    PBClient[PocketBase Client]
+end
+
+User -->|Sign in or Sign up| PBClient
+User -->|Join Room| SocketClient
+SvelteKit --> PBClient
+SvelteKit --> SocketClient
+
+PBClient -->|Check Session| PocketBase
+PBClient -->|Fetch or Send Messages| PocketBase
+PBClient -->|Room List| PocketBase
+
+subgraph Backend
+    Express[Express Server]
+    SocketServer[Socket.IO Server]
+    Express --> SocketServer
+end
+
+SocketClient -->|WebSocket Connection| SocketServer
+SocketServer -->|Auth Check| PocketBase
+SocketServer -->|Emit Events| SocketClient
+
+SocketClient -->|send_message signed| SocketServer
+SocketServer -->|Verify hash of POCKETBASE_SUPERUSER_PASSWORD| EnvCheck[Token Validator]
+EnvCheck -->|Allow or Reject| SocketServer
+
+subgraph PocketBaseServer
+    PocketBase[PocketBase API]
+    PBUsers[Users Collection]
+    PBRooms[Rooms Collection]
+    PBMessages[Messages Collection]
+end
+
+PocketBase --> PBUsers
+PocketBase --> PBRooms
+PocketBase --> PBMessages
+
+PBUsers -->|creates| PBRooms
+PBUsers -->|sends| PBMessages
+PBRooms -->|contains| PBMessages
+
+SocketServer -->|user_joined or user_left| SocketClient
+SocketServer -->|new_message| SocketClient
+
+subgraph Infrastructure
+    TLSCerts[TLS Certificates]
+    EnvVars[Environment Variables]
+    EnvCheck[Token Validator]
+    Express --> TLSCerts
+    Express --> EnvVars
+    PocketBase --> EnvVars
+    SocketServer --> EnvVars
+    SocketServer --> EnvCheck
+end
