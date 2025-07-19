@@ -19,6 +19,7 @@ any sensitive information on **ping.** instances.
 - [PocketBase](https://pocketbase.io) for database, authentication, and admin
   dashboard.
 - [Socket.IO](https://socket.io) for bidirectional real-time communication.
+- [Express](https://expressjs.com/) + Node HTTPS to serve the website.
 
 ### 2. Some future considerations
 
